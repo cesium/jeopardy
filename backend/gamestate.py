@@ -12,11 +12,16 @@ class GameState:
     def setPlayers(players):
         self.players = [Player(player) for player in players]
         self.state = States.SELECTING_QUESTION
+        self.currentPlayer = None
+    def setCurrentPlayer(self, player):
+        print(player)
+        self.currentPlayer = player
     def __init__(self):
         self.players = []
         self.questions = {} 
         self.initQuestions()
         self.state = States.STARTING
+        self.currentQuestion = None
     def initQuestions(self):
         for file in os.listdir("backend/perguntas"):
             category = file[:-4]
@@ -31,13 +36,18 @@ class GameState:
                     break
                 self.questions[category].append(Question(question.strip(), answer.strip(), value))
     def selectQuestion(self, category, value):
-        self.currentQuestion = self.questions[category][value/100-1]
+        self.currentQuestion = self.questions[category][value//100-1]
         self.state = States.ANSWERING_QUESTION
     
     def answerQuestion(self, correct):
-        correct = False
+        if correct:
+            self.currentPlayer.addPoints(self.currentQuestion.getValue())
+            print(self.currentQuestion.getValue())
 
-        
-
+#currentplayer = Player("a")
+#variavel = GameState()
+#variavel.selectQuestion("Entretenimento",100)
+#variavel.setCurrentPlayer(currentplayer)
+#ariavel.answerQuestion(True)
 if __name__ == "__main__":
     game = GameState()
