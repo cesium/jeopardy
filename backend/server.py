@@ -1,49 +1,7 @@
-from http.server import BaseHTTPRequestHandler, HTTPServer
-from gamestate import GameState
+from http.server import HTTPServer
+from httpclass import SimpleHTTPRequestHandler
 import json
 
-state = GameState()
-
-def playertodic(player):
-    pass 
-
-def jsonstate():
-    dicionario = {
-        
-        "currentPlayer": state.currentPlayer,
-        "state":state.state,     
-        "players":[playertodic(p)for p in state.players]
-    }
-    return json.dumps(dicionario).encode("utf-8")
-
-
-# Create a custom HTTPRequestHandler class by subclassing BaseHTTPRequestHandler
-class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
-    
-    # Define the do_GET method to handle GET requests
-    def do_GET(self):
-        if self.path == "/state":
-
-            # Set response status code
-            self.send_response(200)
-            
-            # Set headers
-            self.send_header('Content-type', 'application/json')
-            self.end_headers()
-            
-            # Write the response body
-            self.wfile.write(jsonstate())
-        else:
-            
-            # Set response status code
-            self.send_response(404)
-            
-            # Set headers
-            self.send_header('Content-type', 'application/json')
-            self.end_headers()
-            
-            # Write the response body
-            self.wfile.write(b'{"error":"not found"}')
 
 # Set the host and port for the server
 host = 'localhost'

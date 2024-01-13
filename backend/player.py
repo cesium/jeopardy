@@ -1,9 +1,8 @@
 class Player:
-    def __init__(self, nome):
-        self.nome = nome
+    def __init__(self, name):
+        self.name = name
         self.balance = 0
-    def addPoints(points):
+    def addPoints(self, points):
         self.balance += points
-    def getName(self):
-        return self.nome
+
         

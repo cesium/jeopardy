@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+.background {
+  background: linear-gradient(to top left, #000088, #0000ff);
+}
+
 .quadro {
   position: absolute;
   top: 0px;
