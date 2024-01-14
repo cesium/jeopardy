@@ -2,11 +2,13 @@ import os
 from question import Question
 from player import Player
 from enum import Enum
+import json
 
 class States(Enum):
     STARTING = 0
     SELECTING_QUESTION = 1
     ANSWERING_QUESTION = 2
+    OVER = 3
     
 class GameState:
     def setPlayers(self, players):
@@ -60,4 +62,14 @@ class GameState:
         else:
             self.currentPlayer.addPoints(-1 * self.questions[self.currentQuestion].value)
         print(self.players[0].balance)
+
+    def toJSON(self):
+        dict = {
+            "players": [p.__dict__ for p in self.players],
+            "questions": [q.__dict__ for q in self.questions],
+            "state": self.state.value,
+            "currentQuestion": None if self.currentQuestion is None else self.currentQuestion.__dict__,
+            "currentPlayer": None if self.currentPlayer is None else self.currentPlayer.__dict__
+        }
+        return json.dumps(dict)
 
