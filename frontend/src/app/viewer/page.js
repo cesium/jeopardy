@@ -32,7 +32,12 @@ export default function Viewer() {
   return (
     <>
       {!interacted && (
-        <button onClick={(_) => setInteracted(true)}>TOCAR</button>
+        <button
+          className="text-white bg-accent m-auto block mt-12 py-2 px-4 text-3xl font-extrabold"
+          onClick={(_) => setInteracted(true)}
+        >
+          JOGAR
+        </button>
       )}
       {interacted && <GameState state={state} />}
     </>

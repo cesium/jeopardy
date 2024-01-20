@@ -15,7 +15,9 @@ export default function RootLayout({ children }) {
         <title>Jeopardy</title>
         <link rel="icon" href="/favicon.ico" />
       </head>
-      <body className={inter.className}>{children}</body>
+      <body className={`${inter.className} bg-primary text-white`}>
+        {children}
+      </body>
     </html>
   );
 }
