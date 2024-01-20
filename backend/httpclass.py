@@ -29,6 +29,8 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
             
         # Set headers
         self.send_header('Content-type', 'application/json')
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Access-Control-Allow-Headers', 'content-type')
         self.end_headers()
 
     # Define the do_GET method to handle GET requests
@@ -56,6 +58,9 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         
         # Set headers
         self.send_header('Content-type', 'application/json')
+        self.send_header('Content-type', 'application/json')
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Access-Control-Allow-Headers', 'content-type')
         self.end_headers()
 
         # Write the response body
@@ -84,6 +89,9 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         
         # Set headers
         self.send_header('Content-type', 'application/json')
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Access-Control-Allow-Headers', 'content-type')
+        
         self.end_headers()
 
         # Write the response body
