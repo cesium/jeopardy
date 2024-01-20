@@ -40,6 +40,10 @@ def post_players(body):
         return 200, '{"status": "success"}'
     except AssertionError as e:
         return 422, '{"error": "' + str(e) + '"}'
+    
+def post_start_question():
+    globals.state.setAnswering()
+    return 200, '{"status": "success"}'
 
 def post_answer(body):
     if "correct" not in body or type(body["correct"]) != type(True):

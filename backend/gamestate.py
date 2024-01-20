@@ -7,8 +7,9 @@ import json
 class States(Enum):
     STARTING = 0
     SELECTING_QUESTION = 1
-    ANSWERING_QUESTION = 2
-    OVER = 3
+    READING_QUESTION = 2
+    ANSWERING_QUESTION = 3
+    OVER = 4
     
 class GameState:
     def setPlayers(self, players):
@@ -47,6 +48,9 @@ class GameState:
         if id < 0 or id >= len(self.questions):
             raise ValueError("Index out of bonds")
         self.currentQuestion = id
+        self.state = States.READING_QUESTION
+    
+    def setAnswering(self):
         self.state = States.ANSWERING_QUESTION
     
     def answerQuestion(self, correct):
@@ -54,21 +58,22 @@ class GameState:
             raise ValueError("No question is being answered")
         elif self.currentPlayer is None:
             raise ValueError("No player chosen yet")
-        
         self.questions[self.currentQuestion].answered = True
 
         if correct:
             self.currentPlayer.addPoints(self.questions[self.currentQuestion].value)
         else:
             self.currentPlayer.addPoints(-1 * self.questions[self.currentQuestion].value)
-        print(self.players[0].balance)
+        
+        self.currentPlayer = self.players[0]
+        self.state = States.SELECTING_QUESTION
 
     def toJSON(self):
         dict = {
             "players": [p.__dict__ for p in self.players],
             "questions": [q.__dict__ for q in self.questions],
             "state": self.state.value,
-            "currentQuestion": None if self.currentQuestion is None else self.currentQuestion.__dict__,
+            "currentQuestion": self.currentQuestion,
             "currentPlayer": None if self.currentPlayer is None else self.currentPlayer.__dict__
         }
         return json.dumps(dict)

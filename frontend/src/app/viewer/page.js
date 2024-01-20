@@ -1,23 +1,40 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import useSound from "use-sound";
 
 import GameState from "@/components/GameState";
 
 //const socket = io('http://localhost:8001');
 
 export default function Viewer() {
-    const [state, setState] = useState({});
+  const [playStart] = useSound("/sounds/start.mp3", { interrupt: true });
 
-    useEffect(() => {
-        const socket = new WebSocket("ws://localhost:8001")
+  //In order to play sound, the user must interact with the page. We force this
+  // by making the user click a button before showing the game state
+  const [interacted, setInteracted] = useState(false);
 
-        socket.addEventListener("message", event => {
-            setState(JSON.parse(event.data));
-        });
-    }, []);
+  const [state, setState] = useState({});
+  useEffect(() => {
+    const socket = new WebSocket("ws://localhost:8001");
 
-    return (
-        <GameState state={state} role="viewer"/>
-    );
-};
+    socket.addEventListener("message", (event) => {
+      const newState = JSON.parse(event.data);
+      setState(newState);
+    });
+  }, []);
+
+  useEffect(() => {
+    console.log(state);
+    if (state.state == 3) playStart();
+  }, [state, playStart]);
+
+  return (
+    <>
+      {!interacted && (
+        <button onClick={(_) => setInteracted(true)}>TOCAR</button>
+      )}
+      {interacted && <GameState state={state} />}
+    </>
+  );
+}
