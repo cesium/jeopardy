@@ -78,8 +78,12 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
                 status, content = httpcontroller.set_question(self.__post_body__())
             elif self.path == "/players":
                 status, content = httpcontroller.post_players(self.__post_body__())
+            elif self.path == "/buzz":
+                status, content = httpcontroller.post_buzz(self.__post_body__())
             elif self.path == "/buzz_start":
                 status, content = httpcontroller.post_start_question()
+                with globals.buzz_condition:
+                    globals.buzz_condition.notify_all()
 
             if status // 100 == 2:
                 globals.state_condition.notify_all()

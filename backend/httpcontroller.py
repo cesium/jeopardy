@@ -55,6 +55,15 @@ def post_answer(body):
     except ValueError as e:
         return 422, '{"error": "' + str(e) + '"}'
     
+def post_buzz(body):
+    if "player" not in body or type(body["player"]) != type(1):
+        return 400, '{"error": "bad request"}'
+
+    try:
+        globals.state.setCurrentPlayer(body["player"])
+        return 200, '{"status": "success"}'
+    except ValueError as e:
+        return 422, '{"error": "' + str(e) + '"}'
 
 def set_question(body):
     print(body)

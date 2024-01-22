@@ -20,8 +20,8 @@ class GameState:
         self.currentPlayer = self.players[0]
 
     def setCurrentPlayer(self, player):
-        print(player)
-        self.currentPlayer = player
+        print("OLA " + str(player))
+        self.currentPlayer = self.players[player]
 
     def __init__(self):
         self.players = []

@@ -29,7 +29,7 @@ export default function GameSelectingQuestion({ state }) {
 
         {questionsPerAmount.map((q, idx) => (
           <div
-            className="bg-secondary text-accent py-7"
+            className={`${q.answered ? "bg-primary" : "bg-secondary"} text-accent py-7`}
             key={`question-${idx}`}
           >
             {q.value}
