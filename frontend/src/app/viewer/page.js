@@ -25,7 +25,6 @@ export default function Viewer() {
   }, []);
 
   useEffect(() => {
-    console.log(state);
     if (state.state == 3) playStart();
   }, [state, playStart]);
 
@@ -39,7 +38,7 @@ export default function Viewer() {
           JOGAR
         </button>
       )}
-      {interacted && <GameState state={state} />}
+      {interacted && <GameState state={state} role="viewer" />}
     </>
   );
 }

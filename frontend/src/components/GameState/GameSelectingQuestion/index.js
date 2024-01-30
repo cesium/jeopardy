@@ -15,12 +15,10 @@ function processState(state) {
 
 export default function GameSelectingQuestion({ state }) {
   const [categories, questionsPerAmount] = processState(state);
-  console.log(questionsPerAmount);
+
   return (
     <div className="p-4 uppercase text-center">
-      <div
-        className={`grid gap-1 grid-cols-${categories.length} text-5xl font-extrabold`}
-      >
+      <div className={`grid gap-1 grid-cols-5 text-5xl font-extrabold`}>
         {categories.map((c, idx) => (
           <div className="bg-secondary mb-2 py-3" key={`cat-${idx}`}>
             {c}

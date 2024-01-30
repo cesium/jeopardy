@@ -9,7 +9,8 @@ class States(Enum):
     SELECTING_QUESTION = 1
     READING_QUESTION = 2
     ANSWERING_QUESTION = 3
-    OVER = 4
+    PLAYER_SELECTED = 4
+    OVER = 5
     
 class GameState:
     def setPlayers(self, players):
@@ -20,8 +21,8 @@ class GameState:
         self.currentPlayer = self.players[0]
 
     def setCurrentPlayer(self, player):
-        print("OLA " + str(player))
         self.currentPlayer = self.players[player]
+        self.state = States.PLAYER_SELECTED
 
     def __init__(self):
         self.players = []
@@ -52,6 +53,9 @@ class GameState:
     
     def setAnswering(self):
         self.state = States.ANSWERING_QUESTION
+
+    def is_over(self):
+        return len(list(filter(lambda q: q.answered, self.questions))) == 0
     
     def answerQuestion(self, correct):
         if self.currentQuestion is None:
@@ -66,7 +70,11 @@ class GameState:
             self.currentPlayer.addPoints(-1 * self.questions[self.currentQuestion].value)
         
         self.currentPlayer = self.players[0]
-        self.state = States.SELECTING_QUESTION
+        
+        if self.is_over():
+            self.state = States.OVER
+        else:
+            self.state = States.SELECTING_QUESTION
 
     def toJSON(self):
         dict = {
