@@ -31,6 +31,8 @@ class GameState:
         self.state = States.STARTING
         self.currentQuestion = None
         self.currentPlayer = Player("Ola")
+        self.selectingPlayer = 0
+        self.oneAnsweredCorrectly = False
     def initQuestions(self):
         id = 0
         for file in os.listdir("backend/perguntas"):
@@ -65,9 +67,13 @@ class GameState:
         self.questions[self.currentQuestion].answered = True
 
         if correct:
+            self.oneAnsweredCorrectly = True
+            self.selectingPlayer = self.players.index(self.currentPlayer)
             self.currentPlayer.addPoints(self.questions[self.currentQuestion].value)
         else:
             self.currentPlayer.addPoints(-1 * self.questions[self.currentQuestion].value)
+            if not self.oneAnsweredCorrectly:
+                self.selectingPlayer = (self.selectingPlayer + 1) % 4
         
         self.currentPlayer = self.players[0]
         
@@ -82,7 +88,8 @@ class GameState:
             "questions": [q.__dict__ for q in self.questions],
             "state": self.state.value,
             "currentQuestion": self.currentQuestion,
-            "currentPlayer": None if self.currentPlayer is None else self.currentPlayer.__dict__
+            "currentPlayer": None if self.currentPlayer is None else self.currentPlayer.__dict__,
+            "selectingPlayer": self.selectingPlayer
         }
         return json.dumps(dict)
 
