@@ -12,27 +12,32 @@ defaultState = [
 
 buttonState = defaultState
 reading = False
+readingUntil = time.time_ns()
 
 def get_pressed(state):
     ls = []
     for i in range(0,4):
-         with globals.state_condition:
-            if state[i]["red"] and i not in globals.state.alreadyAnswered:
-                ls = ls + [i]
+        if state[i]["red"] and i not in globals.state.alreadyAnswered:
+            ls = ls + [i]
 
     return ls
 
 def buzz_notification_thread():
     global reading
     reading = False
+    global readingUntil
+    buttonState = defaultState
+    readingUntil = time.time_ns()
     while True:
         with globals.buzz_condition:
             globals.buzz_condition.wait()
             reading = True
+            readingUntil = time.time_ns() + 5e9
 
 def buzz_thread():
     global reading
     global buttonState
+    global readingUntil
     reading = False
     en = Enumeration()
     devices = en.find(manufacturer="Namtai")
@@ -69,7 +74,7 @@ def buzz_thread():
                 pressed = get_pressed(buttonState)
                 print(pressed)
                 if pressed != []:
-                    if reading and timeouts[pressed[0]] < time.time_ns():
+                    if reading and readingUntil >= time.time_ns() and timeouts[pressed[0]] < time.time_ns():
                         buttonState = defaultState
                         requests.post("http://localhost:8000/buzz", json = {"player": pressed[0]})
                         reading = False

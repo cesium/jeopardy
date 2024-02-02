@@ -34,9 +34,9 @@ function CountdownTimer({ initialSeconds, refreshRate, endSound }) {
 export default function GameAnsweringQuestion({ state, role }) {
   return (
     <div className="flex flex-col items-center justify-center w-screen h-screen">
-      {state.state == 4 && (
+      {(state.state == 3 || state.state == 4) && (
         <CountdownTimer
-          initialSeconds={15}
+          initialSeconds={state.state == 4 ? 7 : 10}
           refreshRate={60}
           endSound={role == "viewer"}
         />
