@@ -16,8 +16,9 @@ reading = False
 def get_pressed(state):
     ls = []
     for i in range(0,4):
-         if state[i]["red"]:
-            ls = ls + [i]
+         with globals.state_condition:
+            if state[i]["red"] and i not in globals.state.alreadyAnswered:
+                ls = ls + [i]
 
     return ls
 
@@ -66,6 +67,7 @@ def buzz_thread():
                 buttonState[3]["blue"] = ((data[4] & 0x08) != 0) #blue
 
                 pressed = get_pressed(buttonState)
+                print(pressed)
                 if pressed != []:
                     if reading and timeouts[pressed[0]] < time.time_ns():
                         buttonState = defaultState

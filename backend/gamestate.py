@@ -33,6 +33,8 @@ class GameState:
         self.currentPlayer = Player("Ola")
         self.selectingPlayer = 0
         self.oneAnsweredCorrectly = False
+        self.alreadyAnswered = []
+
     def initQuestions(self):
         id = 0
         for file in os.listdir("backend/perguntas"):
@@ -67,18 +69,22 @@ class GameState:
         self.questions[self.currentQuestion].answered = True
 
         if correct:
+            self.alreadyAnswered = []
             self.oneAnsweredCorrectly = True
             self.selectingPlayer = self.players.index(self.currentPlayer)
             self.currentPlayer.addPoints(self.questions[self.currentQuestion].value)
         else:
+            self.alreadyAnswered = self.alreadyAnswered + [self.players.index(self.currentPlayer)]
             self.currentPlayer.addPoints(-1 * self.questions[self.currentQuestion].value)
-            if not self.oneAnsweredCorrectly:
+            if len(self.alreadyAnswered) == 4 and not self.oneAnsweredCorrectly:
                 self.selectingPlayer = (self.selectingPlayer + 1) % 4
         
         self.currentPlayer = self.players[0]
         
         if self.is_over():
             self.state = States.OVER
+        elif not correct and len(self.alreadyAnswered) != 4:
+            self.state = States.READING_QUESTION
         else:
             self.state = States.SELECTING_QUESTION
 
@@ -89,7 +95,8 @@ class GameState:
             "state": self.state.value,
             "currentQuestion": self.currentQuestion,
             "currentPlayer": None if self.currentPlayer is None else self.currentPlayer.__dict__,
-            "selectingPlayer": self.selectingPlayer
+            "selectingPlayer": self.selectingPlayer,
+            "alreadyAnswered": self.alreadyAnswered
         }
         return json.dumps(dict)
 
