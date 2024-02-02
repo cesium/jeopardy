@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-import * as api from "@/lib/api";
+import * as api from "../../../lib/api";
 
 function PlayerInput({ id, onChange }) {
   return (
@@ -20,9 +20,9 @@ function PlayerInput({ id, onChange }) {
 
 export default function Init() {
   const router = useRouter();
-  const [names, setNames] = useState(["", "", "", ""]);
+  const [names, setNames] = useState<string[]>(["", "", "", ""]);
 
-  const updateNames = (n, i) => {
+  const updateNames = (n: string, i: number) => {
     let newNames = [...names];
     newNames[i] = n;
     setNames(newNames);

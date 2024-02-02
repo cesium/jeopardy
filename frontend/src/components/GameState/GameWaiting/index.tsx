@@ -1,4 +1,10 @@
-export default function GameWaiting({ state }) {
+import { State } from "../../../types";
+
+interface GameWaitingProps {
+  state: State;
+}
+
+export default function GameWaiting({ state }: GameWaitingProps) {
   return (
     <div className="flex items-center h-screen justify-center text-white">
       <div className="block text-center">

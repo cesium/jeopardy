@@ -2,10 +2,12 @@
 
 import { useEffect, useState } from "react";
 
-import * as api from "@/lib/api";
+import * as api from "../../lib/api";
+
+import { Player } from "../../types";
 
 export default function Winners() {
-  const [winners, setWinners] = useState([]);
+  const [winners, setWinners] = useState<Player[]>([]);
   useEffect(() => {
     api.getWinners().then((w) => setWinners(w));
   }, []);

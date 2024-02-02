@@ -4,15 +4,17 @@ import { useEffect, useState } from "react";
 
 import { useRouter } from "next/navigation";
 
-import * as api from "@/lib/api";
+import * as api from "../../lib/api";
 
-import Category from "@/components/Category";
+import Category from "../../components/Category";
+
+import { Question, Player } from "../../types";
 
 export default function Home() {
   const router = useRouter();
 
-  const [categories, setCategories] = useState([]);
-  const [players, setPlayers] = useState([]);
+  const [categories, setCategories] = useState<Question[][]>([]);
+  const [players, setPlayers] = useState<Player[]>([]);
   useEffect(() => {
     api.getQuestions().then((c) => setCategories(c));
     api.getPlayers().then((p) => setPlayers(p));

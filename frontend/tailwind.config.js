@@ -16,8 +16,14 @@ module.exports = {
         primary: "#04041c",
         secondary: "#080836",
         accent: "#ff800d",
+        test: "#2b09dc",
       },
-    },
+      fontFamily: {
+        'sei': ['var(--font-sei)'],
+        'inter': ['var(--font-inter)'],
+        'lava': ['var(--font-lava)'],
+      },
+    },    
   },
   plugins: [],
 };

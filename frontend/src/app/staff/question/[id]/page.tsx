@@ -4,10 +4,14 @@ import { useEffect, useState } from "react";
 
 import { useRouter } from "next/navigation";
 
-import * as api from "@/lib/api";
+import { useSound } from "use-sound";
 
-export default function Question({ params }) {
+import * as api from "../../../../lib/api";
+
+export default function Question({ params }: { params: { id: string } }) {
   const router = useRouter();
+  const [playCorrectSound] = useSound("/sounds/correct.mp3", { interrupt: true });
+  const [playWrongSound] = useSound("/sounds/end.mp3", { interrupt: true });
 
   const [started, setStarted] = useState(false);
   const [question, setQuestion] = useState({
@@ -26,7 +30,14 @@ export default function Question({ params }) {
   };
 
   const submit = (res) => {
-    api.answer(res).then((_) => router.push("/staff"));
+    if (res) {
+      playCorrectSound();
+    }
+    else {
+      playWrongSound();
+    }
+    api.answer(res);
+    setTimeout(() => router.push("/staff"), 5000);
   };
 
   return (

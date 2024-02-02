@@ -1,4 +1,10 @@
-export default function GameOver({ state }) {
+import { State } from "../../../types";
+
+interface GameOverProps {
+  state: State;
+}
+
+export default function GameOver({ state }: GameOverProps) {
   return (
     <div className="flex items-center h-screen justify-center text-white">
       <div className="block text-center">
@@ -6,9 +12,9 @@ export default function GameOver({ state }) {
           Winners
         </h1>
         <ol className="list-decimal uppercase text-xl">
-          {state?.players?.map((w, idx) => (
+          {state?.players?.map((p, idx) => (
             <li key={idx} className="text-lg my-2">
-              <b>{w.name}</b> : {w.balance} tokens
+              <b>{p.name}</b> : {p.balance} tokens
             </li>
           ))}
         </ol>

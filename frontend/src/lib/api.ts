@@ -9,7 +9,7 @@ const API = axios.create({
   },
 });
 
-export async function getQuestion(id) {
+export async function getQuestion(id: string) {
   const response = await API.get(`/question/${id}`);
 
   return response.data;
@@ -39,7 +39,7 @@ export async function getWinners() {
   return response.data;
 }
 
-export async function setQuestion(id) {
+export async function setQuestion(id: number) {
   const response = await API.post("/question", {
     id: id,
   });
@@ -47,7 +47,7 @@ export async function setQuestion(id) {
   return response.data;
 }
 
-export async function setPlayers(players) {
+export async function setPlayers(players: string[]) {
   const response = await API.post("/players", {
     players: players,
   });
@@ -55,7 +55,7 @@ export async function setPlayers(players) {
   return response.data;
 }
 
-export async function answer(correct) {
+export async function answer(correct: boolean) {
   const response = await API.post("/answer", {
     correct: correct,
   });

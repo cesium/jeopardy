@@ -1,6 +1,13 @@
 import Button from "../Button";
 
-export default function Category({ name, questions }) {
+import { Question } from "../../types";
+
+interface CategoryProps {
+  name: string;
+  questions: Question[];
+}
+
+export default function Category({ name, questions }: CategoryProps) {
   return (
     <div className="coluna">
       <h1 className="categoria">{name}</h1>
