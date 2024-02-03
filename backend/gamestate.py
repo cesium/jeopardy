@@ -20,7 +20,7 @@ class GameState:
         self.players = [Player(player) for player in players]
         self.state = States.SELECTING_QUESTION
         self.currentPlayer = self.players[0]
-        self.allowedPlayers = self.players
+        self.allowedPlayers = [0,1,2,3]
 
     def setCurrentPlayer(self, player):
         self.currentPlayer = self.players[player]
@@ -29,6 +29,7 @@ class GameState:
     def __init__(self):
         self.players = []
         self.questions = [] 
+        self.tiebreakQuestions = []
         self.initQuestions()
         self.state = States.STARTING
         self.currentQuestion = None
@@ -41,10 +42,10 @@ class GameState:
 
     def initQuestions(self):
         id = 0
-        for file in os.listdir("backend/perguntas"):
+        for file in os.listdir("backend/perguntas/regular"):
             category = file[:-4]
             value = 0
-            f = open("backend/perguntas/"+file, "r", encoding="utf-8")
+            f = open("backend/perguntas/regular/"+file, "r", encoding="utf-8")
             while True:
                 question = f.readline()
                 answer = f.readline()
@@ -53,8 +54,18 @@ class GameState:
                     break
                 self.questions.append(Question(id, question.strip(), answer.strip(), value, category))
                 id += 1
-        self.tiebreakQuestions = self.questions
+
+        f = open("backend/perguntas/tiebreak.txt", "r", encoding="utf-8")
+        while True:
+            question = f.readline()
+            answer = f.readline()
+            if not question: #TODO: validar número de linhas par
+                break
+            self.tiebreakQuestions.append(Question(id, question.strip(), answer.strip(), 100, "Tiebreak"))
+            id += 1
+
     def selectQuestion(self, id):
+        print(id)
         if id < 0 or id >= len(self.questions):
             raise ValueError("Index out of bonds")
         self.currentQuestion = self.questions[id]
@@ -65,7 +76,12 @@ class GameState:
         self.currentPlayer = self.players[0]
         
         if self.is_over():
-            self.state = States.OVER
+            if(self.is_tiebreak()):
+                self.state = States.READING_QUESTION
+                self.tiebreakIndex += 1
+                self.currentQuestion = self.tiebreakQuestions[self.tiebreakIndex]
+            else:
+                self.state = States.OVER
         else:
             self.state = States.SELECTING_QUESTION
 
@@ -74,17 +90,18 @@ class GameState:
         self.state = States.ANSWERING_QUESTION
 
     def is_over(self):
-        return len(list(filter(lambda q: q.answered, self.questions))) == 0
+        return len(list(filter(lambda q: not q.answered, self.questions))) == 0
     
     def is_tiebreak(self):
         maxTokens = -1e9
         maxPlayers = []
-        for p in self.players:
+
+        for i,p in enumerate(self.players):
             if p.balance > maxTokens:
                 maxTokens = p.balance
-                maxPlayers = [p]
+                maxPlayers = [i]
             elif p.balance == maxTokens:
-                maxPlayers = maxPlayers + [p]
+                maxPlayers = maxPlayers + [i]
         
         if(len(maxPlayers) > 1):
             self.allowedPlayers = maxPlayers
