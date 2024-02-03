@@ -4,6 +4,8 @@ import useSound from "use-sound";
 
 import { State } from "../../../types";
 
+import * as api from "../../../lib/api";
+
 interface GameAnsweringQuestionProps {
   state: State;
   role: string;
@@ -46,6 +48,7 @@ export default function GameAnsweringQuestion({
     interrupt: true,
   });
   const [playBuzzSound] = useSound("/sounds/buzz.mp3", { interrupt: true });
+  const [started, setStarted] = useState(false);
 
   useEffect(() => {
     if (state.state == 4) {
@@ -54,6 +57,19 @@ export default function GameAnsweringQuestion({
       setTimeout(() => stop(), 15500);
     } else stop();
   }, [state]);
+
+
+  const startQuestion = () => {
+    api.startQuestion().then((_) => setStarted(true));
+  };
+
+  const skipQuestion = () => {
+    api.skipQuestion();
+  };
+
+  const submit = (res) => {
+    api.answer(res);
+  };
 
   return (
     <div className="flex flex-col items-center justify-center w-screen h-screen">
@@ -75,9 +91,43 @@ export default function GameAnsweringQuestion({
       <div className="uppercase grow items-center flex font-extrabold text-6xl w-3/4 text-center">
         {state.currentQuestion.statement}
       </div>
-      {role == "host" && (
+      {role != "viewer" && (
         <div className="uppercase grow items-center flex font-extrabold text-2xl text-accent w-3/4 text-center">
           {state.currentQuestion.answer}
+        </div>
+      )}
+      {role == "staff" && started && (
+        <>
+          <div className="w-3/4 grid grid-cols-2 gap-4 mt-12">
+            <button
+              className="w-full bg-red-700 py-2 text-4xl"
+              onClick={(_) => submit(false)}
+            >
+              Errado
+            </button>
+            <button
+              className="w-full bg-green-700 py-2 text-4xl"
+              onClick={(_) => submit(true)}
+            >
+              Certo
+            </button>
+          </div>
+          <button
+            className="w-3/4 bg-amber-700 py-2 text-4xl mt-8"
+            onClick={(_) => skipQuestion()}
+          >
+            Skip
+          </button>
+        </>
+      )}
+      {role == "staff" && !started && (
+        <div className="w-full flex content-center">
+          <button
+            className="w-1/2 m-auto mt-12 bg-yellow-700 py-2 text-4xl"
+            onClick={(_) => startQuestion()}
+          >
+            Aceitar Buzz
+          </button>
         </div>
       )}
       <div className="flex items-center justify-center my-24 text-center">

@@ -94,7 +94,7 @@ export default function GameState({ state, role }: GameStateProps) {
         break;
     }
   }, [state]);
-  console.log(selectingQuestion);
+
   return (
     <>
       {selectingQuestion && (
@@ -102,11 +102,12 @@ export default function GameState({ state, role }: GameStateProps) {
           state={state}
           startAnimation={startAnimation}
           animationPosition={animationPosition}
+          role={role}
         />
       )}
       {answeringQuestion && <GameAnsweringQuestion state={state} role={role} />}
       {gameOver && <GameOver state={state} />}
-      {waiting && <GameWaiting state={state} />}
+      {waiting && <GameWaiting state={state} role={role}/>}
     </>
   );
 }

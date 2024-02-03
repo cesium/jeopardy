@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 
 import { State, Question } from "../../../types";
 
+import * as api from "../../../lib/api";
+
 function processState(state: State): [string[], Question[]] {
   const categories: string[] = [
     ...new Set(state.questions.map((q) => q.category)),
@@ -21,6 +23,7 @@ function processState(state: State): [string[], Question[]] {
 
 interface GameSelectingQuestionProps {
   state: State;
+  role: string;
   startAnimation: boolean;
   animationPosition: number;
 }
@@ -64,6 +67,7 @@ const Animation = ({
 
 export default function GameSelectingQuestion({
   state,
+  role,
   startAnimation,
   animationPosition,
 }: GameSelectingQuestionProps) {
@@ -89,6 +93,11 @@ export default function GameSelectingQuestion({
     getPosition(animationPosition);
   }, [animationPosition]);
 
+  const setQuestion = (id) => {
+    api.setQuestion(id);
+  };
+
+
   return (
     <div className="p-6 uppercase text-center select-none">
       <Animation
@@ -112,9 +121,11 @@ export default function GameSelectingQuestion({
         ))}
 
         {questionsPerAmount.map((q, idx) => (
-          <div
+          <button
             className={`bg-gradient-to-br from-test to-test/50 text-accent p-10 rounded flex space-x-2 place-content-center h-[140px] ${q.answered && "opacity-40"}`}
             key={`question-${idx}`}
+            disabled={q.answered || role != "staff"}
+            onClick={_ => setQuestion(q.id)}
           >
             {!q.answered && (
               <>
@@ -124,7 +135,7 @@ export default function GameSelectingQuestion({
                 </p>
               </>
             )}
-          </div>
+          </button>
         ))}
       </div>
       <div className="flex items-center justify-center mt-12">
