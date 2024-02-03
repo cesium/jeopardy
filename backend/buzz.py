@@ -17,7 +17,7 @@ readingUntil = time.time_ns()
 def get_pressed(state):
     ls = []
     for i in range(0,4):
-        if state[i]["red"] and i not in globals.state.alreadyAnswered:
+        if state[i]["red"] and i not in globals.state.alreadyAnswered and i in globals.state.allowedPlayers:
             ls = ls + [i]
 
     return ls

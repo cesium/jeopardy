@@ -43,18 +43,18 @@ export default function GameAnsweringQuestion({ state, role }) {
       )}
       <div className="my-24 text-center">
         <p className="font-extrabold text-3xl">
-          {state.questions[state.currentQuestion].category}
+          {state.currentQuestion.category}
         </p>
         <p className="font-bold text-2xl mt-2 text-accent">
-          {state.questions[state.currentQuestion].value}
+          {state.currentQuestion.value}
         </p>
       </div>
       <div className="uppercase grow items-center flex font-extrabold text-5xl w-3/4 text-center">
-        {state.questions[state.currentQuestion].statement}
+        {state.currentQuestion.statement}
       </div>
       {role == "host" && (
         <div className="uppercase grow items-center flex font-extrabold text-2xl text-accent w-3/4 text-center">
-          {state.questions[state.currentQuestion].answer}
+          {state.currentQuestion.answer}
         </div>
       )}
       <div className="flex items-center justify-center my-24 text-center">

@@ -45,13 +45,17 @@ def post_start_question():
     globals.state.setAnswering()
     return 200, '{"status": "success"}'
 
+def post_skip():
+    globals.state.skipQuestion()
+    return 200, '{"status": "success"}'
+
 def post_answer(body):
     if "correct" not in body or type(body["correct"]) != type(True):
         return 400, '{"error": "bad request"}'
     
     try:
         globals.state.answerQuestion(body["correct"])
-        return 200, '{"status": "success"}'
+        return 200, f'{{"skip": {str(globals.state.state != 2).lower()}}}'
     except ValueError as e:
         return 422, '{"error": "' + str(e) + '"}'
     

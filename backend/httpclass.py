@@ -74,6 +74,8 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         with globals.state_condition:
             if self.path == "/answer":
                 status, content = httpcontroller.post_answer(self.__post_body__())
+            elif self.path == "/skip":
+                status, content = httpcontroller.post_skip()
             elif self.path == "/question":
                 status, content = httpcontroller.set_question(self.__post_body__())
             elif self.path == "/players":

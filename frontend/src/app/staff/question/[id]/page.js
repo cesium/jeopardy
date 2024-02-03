@@ -25,8 +25,16 @@ export default function Question({ params }) {
     api.startQuestion().then((_) => setStarted(true));
   };
 
+  const skipQuestion = () => {
+    api.skipQuestion().then((_) => router.push("/staff"));
+  };
+
   const submit = (res) => {
-    api.answer(res).then((_) => router.push("/staff"));
+    api.answer(res).then((dt) => {
+      console.log(dt);
+      if (dt.skip) router.push("/staff");
+      else setStarted(false);
+    });
   };
 
   return (
@@ -36,20 +44,28 @@ export default function Question({ params }) {
         <h2 className="mt-12 text-xl font-bold">Resposta:</h2>
         <p className="text-3xl">{question.answer}</p>
         {started && (
-          <div className="grid grid-cols-2 gap-4 mt-12">
+          <>
+            <div className="grid grid-cols-2 gap-4 mt-12">
+              <button
+                className="w-full bg-red-700 py-2 text-4xl"
+                onClick={(_) => submit(false)}
+              >
+                Errado
+              </button>
+              <button
+                className="w-full bg-green-700 py-2 text-4xl"
+                onClick={(_) => submit(true)}
+              >
+                Certo
+              </button>
+            </div>
             <button
-              className="w-full bg-red-700 py-2 text-4xl"
-              onClick={(_) => submit(false)}
+              className="w-full bg-amber-700 py-2 text-4xl mt-8"
+              onClick={(_) => skipQuestion()}
             >
-              Errado
+              Skip
             </button>
-            <button
-              className="w-full bg-green-700 py-2 text-4xl"
-              onClick={(_) => submit(true)}
-            >
-              Certo
-            </button>
-          </div>
+          </>
         )}
         {!started && (
           <div className="w-full flex content-center">
