@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { useState } from "react";
 
@@ -8,7 +8,7 @@ import * as api from "../../../lib/api";
 
 interface GameWaitingProps {
   state: State;
-  role: string
+  role: string;
 }
 
 function PlayerInput({ id, onChange }) {
@@ -70,8 +70,6 @@ function GameWaitingStaff({ state }: GameWaitingProps) {
 }
 
 export default function GameWaiting({ state, role }: GameWaitingProps) {
-  if(role == "staff")
-    return <GameWaitingStaff state={state} role={role}/>;
-  else
-    return <GameWaitingNonStaff state={state} role={role}/>;
+  if (role == "staff") return <GameWaitingStaff state={state} role={role} />;
+  else return <GameWaitingNonStaff state={state} role={role} />;
 }

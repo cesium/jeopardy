@@ -97,7 +97,6 @@ export default function GameSelectingQuestion({
     api.setQuestion(id);
   };
 
-
   return (
     <div className="p-6 uppercase text-center select-none">
       <Animation
@@ -125,7 +124,7 @@ export default function GameSelectingQuestion({
             className={`bg-gradient-to-br from-test to-test/50 text-accent p-10 rounded flex space-x-2 place-content-center h-[140px] ${q.answered && "opacity-40"}`}
             key={`question-${idx}`}
             disabled={q.answered || role != "staff"}
-            onClick={_ => setQuestion(q.id)}
+            onClick={(_) => setQuestion(q.id)}
           >
             {!q.answered && (
               <>

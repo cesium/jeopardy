@@ -21,7 +21,6 @@ export default function GameState({ state, role }: GameStateProps) {
   const [gameOver, setGameOver] = useState<boolean>(false);
   const [waiting, setWaiting] = useState<boolean>(false);
 
-
   function getCellNr(): number {
     const cq = state.currentQuestion;
     const value = cq.value;
@@ -107,7 +106,7 @@ export default function GameState({ state, role }: GameStateProps) {
       )}
       {answeringQuestion && <GameAnsweringQuestion state={state} role={role} />}
       {gameOver && <GameOver state={state} />}
-      {waiting && <GameWaiting state={state} role={role}/>}
+      {waiting && <GameWaiting state={state} role={role} />}
     </>
   );
 }

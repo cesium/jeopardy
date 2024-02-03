@@ -58,7 +58,6 @@ export default function GameAnsweringQuestion({
     } else stop();
   }, [state]);
 
-
   const startQuestion = () => {
     api.startQuestion().then((_) => setStarted(true));
   };
