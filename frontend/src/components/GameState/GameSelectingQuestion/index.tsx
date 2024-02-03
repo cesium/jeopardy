@@ -3,7 +3,9 @@ import { useState, useEffect } from "react";
 import { State, Question } from "../../../types";
 
 function processState(state: State): [string[], Question[]] {
-  const categories: string[] = [...new Set(state.questions.map((q) => q.category))];
+  const categories: string[] = [
+    ...new Set(state.questions.map((q) => q.category)),
+  ];
 
   const questions: Question[] = state.questions.sort((a, b) => {
     const res = a.value - b.value;
@@ -23,7 +25,15 @@ interface GameSelectingQuestionProps {
   animationPosition: number;
 }
 
-const Animation = ({start, left, top, cellWidth, cellHeight, totalWidth, totalHeight}) => {
+const Animation = ({
+  start,
+  left,
+  top,
+  cellWidth,
+  cellHeight,
+  totalWidth,
+  totalHeight,
+}) => {
   const startStyle: React.CSSProperties = {
     position: "absolute",
     zIndex: 100,
@@ -31,7 +41,7 @@ const Animation = ({start, left, top, cellWidth, cellHeight, totalWidth, totalHe
     top: top,
     width: cellWidth,
     height: cellHeight,
-    transition: "all 1s ease-in-out"
+    transition: "all 1s ease-in-out",
   };
 
   const afterStyle: React.CSSProperties = {
@@ -41,26 +51,34 @@ const Animation = ({start, left, top, cellWidth, cellHeight, totalWidth, totalHe
     top: 0,
     width: totalWidth,
     height: totalHeight,
-    transition: "all 1s ease-in-out"
+    transition: "all 1s ease-in-out",
   };
 
-  return <div className={`${start ? "bg-primary border-none" : "border-accent border-4 bg-transparent"} rounded`} style={start ? afterStyle : startStyle}/>;
+  return (
+    <div
+      className={`${start ? "bg-primary border-none" : "border-accent border-4 bg-transparent"} rounded`}
+      style={start ? afterStyle : startStyle}
+    />
+  );
 };
 
-export default function GameSelectingQuestion({ state, startAnimation, animationPosition }: GameSelectingQuestionProps) {
+export default function GameSelectingQuestion({
+  state,
+  startAnimation,
+  animationPosition,
+}: GameSelectingQuestionProps) {
   const [categories, questionsPerAmount] = processState(state);
   const [left, setLeft] = useState<number>(0);
   const [top, setTop] = useState<number>(0);
 
   const totalWidth: number = screen.width;
   const totalHeight: number = screen.height;
-  const cellWidth: number = (totalWidth - 24*2 - 8*4) / 5;
+  const cellWidth: number = (totalWidth - 24 * 2 - 8 * 4) / 5;
   const cellHeight: number = 140;
 
   function getPosition(cellNr: number) {
-    const row = Math.floor(cellNr / 5);
-    const column = cellNr % 5 - 1;
-    console.log("column", column);
+    const row = Math.ceil(cellNr / 5) - 1;
+    const column = (cellNr % 5) === 0 ? 4 : (cellNr % 5) - 1;
     const left = 24 + column * cellWidth + column * 8;
     const top = 24 + 64 + 12 + row * cellHeight + row * 8;
     setLeft(left);
@@ -73,14 +91,23 @@ export default function GameSelectingQuestion({ state, startAnimation, animation
 
   return (
     <div className="p-6 uppercase text-center select-none">
-      <Animation start={startAnimation} left={left} top={top} cellWidth={cellWidth} cellHeight={cellHeight} totalWidth={totalWidth} totalHeight={totalHeight} />
+      <Animation
+        start={startAnimation}
+        left={left}
+        top={top}
+        cellWidth={cellWidth}
+        cellHeight={cellHeight}
+        totalWidth={totalWidth}
+        totalHeight={totalHeight}
+      />
 
       <div className={`grid gap-2 grid-cols-5 text-5xl font-extrabold`}>
         {categories.map((c, idx) => (
-          <div className="bg-test mb-1 py-3 text-4xl rounded" key={`cat-${idx}`}>
-            <p className="drop-shadow-md">
-              {c}
-            </p>
+          <div
+            className="bg-test mb-1 py-3 text-4xl rounded"
+            key={`cat-${idx}`}
+          >
+            <p className="drop-shadow-md">{c}</p>
           </div>
         ))}
 

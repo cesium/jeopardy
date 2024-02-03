@@ -18,5 +18,5 @@ export default function Host() {
     });
   }, []);
 
-  return <GameState state={state} role="host" />;
+  return state && <GameState state={state} role="host" />;
 }

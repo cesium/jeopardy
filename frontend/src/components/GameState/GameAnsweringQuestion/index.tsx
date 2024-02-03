@@ -11,7 +11,7 @@ interface GameAnsweringQuestionProps {
 
 function CountdownTimer({ initialSeconds, refreshRate, endSound }) {
   const [seconds, setSeconds] = useState(initialSeconds);
-  const [playEndSound] = useSound("/sounds/end.mp3", { interrupt: true });  
+  const [playEndSound] = useSound("/sounds/end.mp3", { interrupt: true });
 
   useEffect(() => {
     if (seconds <= 0) {
@@ -38,8 +38,13 @@ function CountdownTimer({ initialSeconds, refreshRate, endSound }) {
   );
 }
 
-export default function GameAnsweringQuestion({ state, role }: GameAnsweringQuestionProps) {
-  const [playTimerSound, { stop }] = useSound("/sounds/timer.mp3", { interrupt: true });
+export default function GameAnsweringQuestion({
+  state,
+  role,
+}: GameAnsweringQuestionProps) {
+  const [playTimerSound, { stop }] = useSound("/sounds/timer.mp3", {
+    interrupt: true,
+  });
   const [playBuzzSound] = useSound("/sounds/buzz.mp3", { interrupt: true });
 
   useEffect(() => {
@@ -47,9 +52,7 @@ export default function GameAnsweringQuestion({ state, role }: GameAnsweringQues
       playBuzzSound();
       setTimeout(() => playTimerSound(), 500);
       setTimeout(() => stop(), 15500);
-    }
-    else
-      stop();
+    } else stop();
   }, [state]);
 
   function getCurrentQuestion() {

@@ -10,7 +10,9 @@ import * as api from "../../../../lib/api";
 
 export default function Question({ params }: { params: { id: string } }) {
   const router = useRouter();
-  const [playCorrectSound] = useSound("/sounds/correct.mp3", { interrupt: true });
+  const [playCorrectSound] = useSound("/sounds/correct.mp3", {
+    interrupt: true,
+  });
   const [playWrongSound] = useSound("/sounds/end.mp3", { interrupt: true });
 
   const [started, setStarted] = useState(false);
@@ -32,8 +34,7 @@ export default function Question({ params }: { params: { id: string } }) {
   const submit = (res) => {
     if (res) {
       playCorrectSound();
-    }
-    else {
+    } else {
       playWrongSound();
     }
     api.answer(res);

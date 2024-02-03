@@ -19,11 +19,11 @@ module.exports = {
         test: "#2b09dc",
       },
       fontFamily: {
-        'sei': ['var(--font-sei)'],
-        'inter': ['var(--font-inter)'],
-        'lava': ['var(--font-lava)'],
+        sei: ["var(--font-sei)"],
+        inter: ["var(--font-inter)"],
+        lava: ["var(--font-lava)"],
       },
-    },    
+    },
   },
   plugins: [],
 };

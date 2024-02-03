@@ -3,7 +3,7 @@ import GameSelectingQuestion from "./GameSelectingQuestion";
 import GameWaiting from "./GameWaiting";
 import GameOver from "./GameOver";
 
-import { State } from "../../types"; 
+import { State } from "../../types";
 
 import { useEffect, useState } from "react";
 
@@ -28,7 +28,9 @@ export default function GameState({ state, role }: GameStateProps) {
   function getCellNr(): number {
     const cq = getCurrentQuestion();
     const value = cq.value;
-    const categories: string[] = [...new Set(state.questions.map((q) => q.category))];
+    const categories: string[] = [
+      ...new Set(state.questions.map((q) => q.category)),
+    ];
     const column = categories.indexOf(cq.category);
     let row = 0;
 
@@ -53,7 +55,7 @@ export default function GameState({ state, role }: GameStateProps) {
     }
 
     console.log("cellNr", row * 5 + column + 1);
-  
+
     return row * 5 + column + 1;
   }
 

@@ -25,7 +25,7 @@ const Viewer = () => {
       const newState: State = JSON.parse(event.data);
       setState(newState);
       console.log("state updated:", newState);
-    });    
+    });
   }, []);
 
   useEffect(() => {
@@ -45,6 +45,6 @@ const Viewer = () => {
       {interacted && state != null && <GameState state={state} role="viewer" />}
     </>
   );
-}
+};
 
 export default Viewer;
