@@ -55,33 +55,29 @@ export default function GameAnsweringQuestion({
     } else stop();
   }, [state]);
 
-  function getCurrentQuestion() {
-    return state.questions.find((q) => q.id == state.currentQuestion);
-  }
-
   return (
     <div className="flex flex-col items-center justify-center w-screen h-screen">
-      {state.state == 4 && (
+      {(state.state == 3 || state.state == 4) && (
         <CountdownTimer
-          initialSeconds={15}
+          initialSeconds={state.state == 4 ? 7 : 10}
           refreshRate={60}
           endSound={role == "viewer"}
         />
       )}
       <div className="my-24 text-center">
         <p className="font-extrabold text-3xl uppercase">
-          {getCurrentQuestion().category}
+          {state.currentQuestion.category}
         </p>
         <p className="font-bold text-3xl mt-2 text-accent">
-          {getCurrentQuestion().value}
+          {state.currentQuestion.value}
         </p>
       </div>
       <div className="uppercase grow items-center flex font-extrabold text-6xl w-3/4 text-center">
-        {getCurrentQuestion().statement}
+        {state.currentQuestion.statement}
       </div>
       {role == "host" && (
         <div className="uppercase grow items-center flex font-extrabold text-2xl text-accent w-3/4 text-center">
-          {getCurrentQuestion().answer}
+          {state.currentQuestion.answer}
         </div>
       )}
       <div className="flex items-center justify-center my-24 text-center">

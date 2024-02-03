@@ -21,12 +21,9 @@ export default function GameState({ state, role }: GameStateProps) {
   const [gameOver, setGameOver] = useState<boolean>(false);
   const [waiting, setWaiting] = useState<boolean>(false);
 
-  function getCurrentQuestion() {
-    return state.questions.find((q) => q.id == state.currentQuestion);
-  }
 
   function getCellNr(): number {
-    const cq = getCurrentQuestion();
+    const cq = state.currentQuestion;
     const value = cq.value;
     const categories: string[] = [
       ...new Set(state.questions.map((q) => q.category)),
@@ -97,7 +94,7 @@ export default function GameState({ state, role }: GameStateProps) {
         break;
     }
   }, [state]);
-
+  console.log(selectingQuestion);
   return (
     <>
       {selectingQuestion && (

@@ -16,6 +16,6 @@ export type State = {
   players: Player[];
   questions: Question[];
   state: number;
-  currentQuestion: number;
+  currentQuestion: Question;
   currentPlayer: Player;
 };

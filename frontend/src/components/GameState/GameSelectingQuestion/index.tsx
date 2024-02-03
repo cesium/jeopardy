@@ -73,17 +73,17 @@ export default function GameSelectingQuestion({
 
   const totalWidth: number = screen.width;
   const totalHeight: number = screen.height;
-  const cellWidth: number = (totalWidth - 24 * 2 - 8 * 4) / 5;
+  const cellWidth: number = (totalWidth - 24 * 2 - 8 * 4) / 4;
   const cellHeight: number = 140;
 
   function getPosition(cellNr: number) {
     const row = Math.ceil(cellNr / 5) - 1;
-    const column = (cellNr % 5) === 0 ? 4 : (cellNr % 5) - 1;
+    const column = cellNr % 5 === 0 ? 4 : (cellNr % 5) - 1;
     const left = 24 + column * cellWidth + column * 8;
     const top = 24 + 64 + 12 + row * cellHeight + row * 8;
     setLeft(left);
     setTop(top);
-  };
+  }
 
   useEffect(() => {
     getPosition(animationPosition);
@@ -101,7 +101,7 @@ export default function GameSelectingQuestion({
         totalHeight={totalHeight}
       />
 
-      <div className={`grid gap-2 grid-cols-5 text-5xl font-extrabold`}>
+      <div className={`grid gap-2 grid-cols-4 text-5xl font-extrabold`}>
         {categories.map((c, idx) => (
           <div
             className="bg-test mb-1 py-3 text-4xl rounded"

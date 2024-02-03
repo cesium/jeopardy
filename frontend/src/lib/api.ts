@@ -27,6 +27,12 @@ export async function startQuestion() {
   return response.data;
 }
 
+export async function skipQuestion() {
+  const response = await API.post("/skip");
+
+  return response.data;
+}
+
 export async function getPlayers() {
   const response = await API.get("/players");
 

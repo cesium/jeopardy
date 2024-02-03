@@ -18,8 +18,8 @@
     "use-sound": "^4.0.1"
   },
   "devDependencies": {
-    "@types/node": "^20.11.16",
-    "@types/react": "^18.2.51",
+    "@types/node": "20.11.16",
+    "@types/react": "18.2.52",
     "autoprefixer": "^10.0.1",
     "eslint": "^8",
     "eslint-config-next": "14.0.3",
