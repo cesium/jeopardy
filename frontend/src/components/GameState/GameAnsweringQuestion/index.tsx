@@ -68,7 +68,7 @@ export default function GameAnsweringQuestion({
   };
 
   const skipQuestion = () => {
-    api.skipQuestion();
+    api.skipQuestion().then(_ => setStarted(false));
   };
 
   const submit = (res) => {

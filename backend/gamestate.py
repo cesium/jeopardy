@@ -133,6 +133,7 @@ class GameState:
         if self.is_over():
             if(self.is_tiebreak()):
                 self.state = States.READING_QUESTION
+                self.alreadyAnswered = []
                 self.tiebreakIndex += 1
                 self.currentQuestion = self.tiebreakQuestions[self.tiebreakIndex]
             else:
