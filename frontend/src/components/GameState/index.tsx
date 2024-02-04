@@ -105,7 +105,7 @@ export default function GameState({ state, role }: GameStateProps) {
         />
       )}
       {answeringQuestion && <GameAnsweringQuestion state={state} role={role} />}
-      {gameOver && <GameOver state={state} />}
+      {gameOver && <GameOver state={state} role={role} />}
       {waiting && <GameWaiting state={state} role={role} />}
     </>
   );

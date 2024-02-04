@@ -34,7 +34,7 @@ function CountdownTimer({ initialSeconds, refreshRate, endSound }) {
 
   return (
     <div
-      className={`fixed top-0 h-12 transition-colors ${percentage >= 50 ? "bg-green-700" : percentage >= 20 ? "bg-amber-300" : "bg-red-700"}`}
+      className={`fixed top-0 h-8 transition-colors ${percentage >= 50 ? "bg-green-700" : percentage >= 20 ? "bg-amber-300" : "bg-red-700"}`}
       style={{ width: percentage + "vw" }}
     ></div>
   );
@@ -48,7 +48,11 @@ export default function GameAnsweringQuestion({
     interrupt: true,
   });
   const [playBuzzSound] = useSound("/sounds/buzz.mp3", { interrupt: true });
-  const [started, setStarted] = useState(false);
+  const [playCorrectSound] = useSound("/sounds/correct.mp3", {
+    interrupt: true,
+  });
+  const [playWrongSound] = useSound("/sounds/end.mp3", { interrupt: true });
+  const [started, setStarted] = useState<boolean>(false);
 
   useEffect(() => {
     if (state.state == 4) {
@@ -56,7 +60,8 @@ export default function GameAnsweringQuestion({
       setTimeout(() => playTimerSound(), 500);
       setTimeout(() => stop(), 15500);
     } else stop();
-  }, [state]);
+    
+  }, [state, playBuzzSound]);
 
   const startQuestion = () => {
     api.startQuestion().then((_) => setStarted(true));
@@ -67,6 +72,11 @@ export default function GameAnsweringQuestion({
   };
 
   const submit = (res) => {
+    if (res) {
+      playCorrectSound();
+    } else {
+      playWrongSound();
+    }
     api.answer(res);
   };
 
@@ -129,7 +139,7 @@ export default function GameAnsweringQuestion({
           </button>
         </div>
       )}
-      <div className="flex items-center justify-center my-24 text-center">
+      <div className="flex items-center justify-center my-24 text-center uppercase">
         {state.players.map((p, idx) => (
           <div
             key={`player-${idx}`}

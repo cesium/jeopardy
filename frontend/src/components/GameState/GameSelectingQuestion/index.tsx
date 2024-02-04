@@ -59,7 +59,7 @@ const Animation = ({
 
   return (
     <div
-      className={`${start ? "bg-primary border-none" : "border-accent border-4 bg-transparent"} rounded`}
+      className={`${start ? "bg-primary border-none" : "border-white/70 border-2 bg-transparent"} rounded`}
       style={start ? afterStyle : startStyle}
     />
   );
@@ -77,7 +77,7 @@ export default function GameSelectingQuestion({
 
   const totalWidth: number = screen.width;
   const totalHeight: number = screen.height;
-  const cellWidth: number = (totalWidth - 24 * 2 - 8 * 4) / 4;
+  const cellWidth: number = (totalWidth - 24 * 2 - 8 * (categories.length - 1)) / 4;
   const cellHeight: number = 140;
 
   function getPosition(cellNr: number) {
@@ -118,21 +118,17 @@ export default function GameSelectingQuestion({
             <p className="drop-shadow-md">{c}</p>
           </div>
         ))}
-
         {questionsPerAmount.map((q, idx) => (
           <button
-            className={`bg-gradient-to-br from-test to-test/50 text-accent p-10 rounded flex space-x-2 place-content-center h-[140px] ${q.answered && "opacity-40"}`}
+            className={`bg-gradient-to-br from-test to-test/50 text-accent p-10 rounded flex space-x-2 place-content-center h-[140px] items-center ${q.answered && "opacity-40"}`}
             key={`question-${idx}`}
             disabled={q.answered || role != "staff"}
             onClick={(_) => setQuestion(q.id)}
           >
             {!q.answered && (
-              <>
-                {/* <img src="/images/sei-logo.svg" className="w-[25px] drop-shadow-lg" /> */}
-                <p className="text-7xl drop-shadow-lg">
-                  {!q.answered && q.value}
-                </p>
-              </>
+              <p className="text-8xl drop-shadow-lg">
+                {!q.answered && q.value}
+              </p>
             )}
           </button>
         ))}
@@ -140,8 +136,8 @@ export default function GameSelectingQuestion({
       <div className="flex items-center justify-center mt-12">
         {state.players.map((p, idx) => (
           <div key={`player-${idx}`} className="mx-12 uppercase">
-            <p className="font-extrabold text-4xl">{p.name}</p>
-            <p className="font-bold text-3xl mt-2">{p.balance}</p>
+            <p className="font-bold text-4xl">{p.name}</p>
+            <p className="font-medium text-3xl mt-2">{p.balance}</p>
           </div>
         ))}
       </div>

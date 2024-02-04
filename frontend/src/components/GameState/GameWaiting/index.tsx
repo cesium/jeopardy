@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { State } from "../../../types";
 
 import * as api from "../../../lib/api";
+import useSound from "use-sound";
 
 interface GameWaitingProps {
   state: State;
@@ -25,12 +26,21 @@ function PlayerInput({ id, onChange }) {
 }
 
 function GameWaitingNonStaff({ state }: GameWaitingProps) {
+  const [playThemeSong, {stop}] = useSound("/sounds/themesong.mp3", { loop: true, volume: 0.5 });
+
+  useEffect(() => {
+    playThemeSong();
+    if (state.state != 0) {
+      stop();
+    }
+  }, [state, playThemeSong]);
+
   return (
     <div className="flex items-center h-screen justify-center text-white">
       <div className="block text-center">
-        <h1 className="uppercase text-accent text-8xl font-extrabold mb-12">
-          SEI OU NÃO SEI
-        </h1>
+        <video className="w-full" autoPlay muted loop>
+          <source src="videos/logo.mp4" type="video/mp4" />
+        </video>
       </div>
     </div>
   );
@@ -38,7 +48,7 @@ function GameWaitingNonStaff({ state }: GameWaitingProps) {
 
 function GameWaitingStaff({ state }: GameWaitingProps) {
   const [names, setNames] = useState<string[]>(["", "", "", ""]);
-
+  
   const updateNames = (n: string, i: number) => {
     let newNames = [...names];
     newNames[i] = n;
