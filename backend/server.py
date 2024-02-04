@@ -4,7 +4,7 @@ from httpclass import SimpleHTTPRequestHandler
 
 def webserver_thread():
     # Set the host and port for the server
-    host = 'localhost'
+    host = '0.0.0.0'
     port = 8000
 
     # Create an instance of HTTPServer with the defined host and port, and the custom handler

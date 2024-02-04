@@ -7,7 +7,7 @@ import { State } from "../../types.js";
 
 import GameState from "../../components/GameState";
 
-//const socket = io('http://localhost:8001');
+//const socket = io('http://192.168.1.200:8001');
 
 const Viewer = () => {
   const [playStart] = useSound("/sounds/start.mp3", { interrupt: true });
@@ -19,7 +19,7 @@ const Viewer = () => {
   const [state, setState] = useState<State>(null);
 
   useEffect(() => {
-    const socket = new WebSocket("ws://localhost:8001");
+    const socket = new WebSocket("ws://192.168.1.200:8001");
 
     socket.addEventListener("message", (event) => {
       const newState: State = JSON.parse(event.data);

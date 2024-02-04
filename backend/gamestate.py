@@ -74,6 +74,7 @@ class GameState:
     def skipQuestion(self):
         self.currentQuestion.answered = True
         self.currentPlayer = self.players[0]
+        self.alreadyAnswered = []
         
         if self.is_over():
             if(self.is_tiebreak()):
@@ -117,7 +118,6 @@ class GameState:
         self.currentQuestion.answered = True
 
         if correct:
-            self.alreadyAnswered = []
             self.oneAnsweredCorrectly = True
             self.selectingPlayer = self.players.index(self.currentPlayer)
             self.currentPlayer.addPoints(self.currentQuestion.value)
@@ -140,6 +140,7 @@ class GameState:
         elif not correct and len(self.alreadyAnswered) != 4:
             self.state = States.READING_QUESTION
         else:
+            self.alreadyAnswered = []
             self.state = States.SELECTING_QUESTION
 
     def toJSON(self):

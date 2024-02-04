@@ -77,7 +77,7 @@ export default function GameAnsweringQuestion({
     } else {
       playWrongSound();
     }
-    api.answer(res);
+    api.answer(res).then(_ => setStarted(false));
   };
 
   return (

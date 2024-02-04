@@ -18,6 +18,8 @@ def get_pressed(state):
     ls = []
     for i in range(0,4):
         if state[i]["red"]:
+            print(globals.state.alreadyAnswered)
+            print(globals.state.allowedPlayers)
             print(i)
         
         if state[i]["red"] and i not in globals.state.alreadyAnswered and i in globals.state.allowedPlayers:
@@ -77,11 +79,16 @@ def buzz_thread():
                 pressed = get_pressed(buttonState)
 
                 if pressed != []:
-                    if reading and readingUntil >= time.time_ns() and timeouts[pressed[0]] < time.time_ns():
-                        buttonState = defaultState
-                        requests.post("http://localhost:8000/buzz", json = {"player": pressed[0]})
-                        reading = False
+                    if reading and readingUntil >= time.time_ns():
+                        for i in range(0,len(pressed)):
+                            if timeouts[pressed[i]] < time.time_ns():
+                                buttonState = defaultState
+                                requests.post("http://localhost:8000/buzz", json = {"player": pressed[i]})
+                                reading = False
+                                break
+                        print("Timeout")
                     elif not reading:
+                        print("Not reading")
                         for p in pressed:
                             timeouts[p] = time.time_ns() + 5e9
                     

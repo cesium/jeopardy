@@ -69,7 +69,7 @@ def websockets_thread():
 
     # start server
     server = Server()
-    start_server = websockets.serve(server.ws_handler,'localhost',8001)
+    start_server = websockets.serve(server.ws_handler,'0.0.0.0',8001)
     counter = 0 
 
     # start timer thread

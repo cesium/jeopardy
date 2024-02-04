@@ -36,6 +36,7 @@ const Animation = ({
   cellHeight,
   totalWidth,
   totalHeight,
+  disabled
 }) => {
   const startStyle: React.CSSProperties = {
     position: "absolute",
@@ -59,7 +60,7 @@ const Animation = ({
 
   return (
     <div
-      className={`${start ? "bg-primary border-none" : "border-white/70 border-2 bg-transparent"} rounded`}
+      className={`${disabled ? "hidden" : ""} ${start ? "bg-primary border-none" : "border-white/70 border-2 bg-transparent"} rounded`}
       style={start ? afterStyle : startStyle}
     />
   );
@@ -107,6 +108,7 @@ export default function GameSelectingQuestion({
         cellHeight={cellHeight}
         totalWidth={totalWidth}
         totalHeight={totalHeight}
+        disabled={role == "staff"}
       />
 
       <div className={`grid gap-2 grid-cols-4 text-5xl font-extrabold`}>

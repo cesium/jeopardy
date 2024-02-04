@@ -25,7 +25,7 @@ export default function GameOver({ state, role }: GameOverProps) {
           Winners
         </h1>
         <ol className="list-decimal uppercase">
-          {state?.players?.map((p, idx) => (
+          {state?.players?.sort((a,b) => b.balance - a.balance).map((p, idx) => (
             <div key={idx} className="text-3xl my-2">
               <p className={`${idx == 0 && "text-6xl"} ${idx == 1 && "text-5xl"} ${idx == 2 && "text-4xl"} flex place-content-between space-x-24`}>
                 <b>{p.name}</b>
