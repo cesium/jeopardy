@@ -9,7 +9,9 @@ import { Player } from "../../types";
 export default function Winners() {
   const [winners, setWinners] = useState<Player[]>([]);
   useEffect(() => {
-    api.getWinners().then((w) => setWinners(w.sort((a,b) => b.balance - a.balance)));
+    api
+      .getWinners()
+      .then((w) => setWinners(w.sort((a, b) => b.balance - a.balance)));
   }, []);
   return (
     <div className="flex background h-screen w-screen items-center justify-center text-white">

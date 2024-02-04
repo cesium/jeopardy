@@ -36,7 +36,7 @@ const Animation = ({
   cellHeight,
   totalWidth,
   totalHeight,
-  disabled
+  disabled,
 }) => {
   const startStyle: React.CSSProperties = {
     position: "absolute",

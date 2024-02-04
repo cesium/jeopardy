@@ -24,15 +24,14 @@ export default function GameOver({ state, role }: GameOverProps) {
         <h1 className="uppercase text-accent text-8xl font-extrabold text-center">
           Winners
         </h1>
-        <ol className="list-decimal uppercase">
-          {state?.players?.sort((a,b) => b.balance - a.balance).map((p, idx) => (
-            <div key={idx} className="text-3xl my-2">
-              <p className={`${idx == 0 && "text-6xl"} ${idx == 1 && "text-5xl"} ${idx == 2 && "text-4xl"} flex place-content-between space-x-24`}>
-                <b>{p.name}</b>
-                <span>{p.balance} tokens</span>
-              </p>
-            </div>
-          ))}
+        <ol className="list-decimal uppercase text-xl">
+          {state?.players
+            ?.sort((a, b) => b.balance - a.balance)
+            .map((p, idx) => (
+              <li key={idx} className="text-lg my-2">
+                <b>{p.name}</b> : {p.balance} tokens
+              </li>
+            ))}
         </ol>
       </div>
     </div>

@@ -10,7 +10,7 @@ export default function Host() {
   const [state, setState] = useState<State>(null);
 
   useEffect(() => {
-    const socket = new WebSocket("ws://192.168.1.200:8001");
+    const socket = new WebSocket(process.env.NEXT_PUBLIC_WS_URL);
 
     socket.addEventListener("message", (event) => {
       const newState = JSON.parse(event.data);
