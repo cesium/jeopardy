@@ -25,8 +25,11 @@ export default function RootLayout({ children }) {
         <link rel="icon" href="/favicon.ico" />
       </head>
       <body
-        className={`${sei.variable} ${inter.variable} ${lava.variable} font-sei bg-primary text-neutral-100`}
+        className={`${sei.variable} ${inter.variable} ${lava.variable} font-sei bg-primary text-neutral-100 h-screen overflow-hidden`}
       >
+        <video className="w-full -z-10 absolute" autoPlay muted loop>
+          <source src="/videos/estrelas.mp4" type="video/mp4" />
+        </video>
         {children}
       </body>
     </html>

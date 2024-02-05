@@ -57,9 +57,9 @@ export default function GameAnsweringQuestion({
   useEffect(() => {
     if (state.state == 4) {
       playBuzzSound();
-      setTimeout(() => playTimerSound(), 500);
-      setTimeout(() => stop(), 15500);
-    } else stop();
+      // setTimeout(() => playTimerSound(), 500);
+      // setTimeout(() => stop(), 15500);
+    } // else stop();
     
   }, [state, playBuzzSound]);
 
