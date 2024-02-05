@@ -1,0 +1,8 @@
+O algoritmo de ordenação que divide um array em duas metades, ordena recursivamente cada metade e depois combina as partes ordenadas é o algoritmo de ____________ ?
+Merge Sort
+Um algoritmo de busca que começa na raiz de uma árvore ou grafo e explora todos os vizinhos antes de retroceder para explorar outros ramos é o algoritmo de _______.
+DFS (Depth First Search)
+Que nome é dado à seguinte técnica?  for(int i=0; i < 18 ; i+=2) a[i] = 1; a[i+1] = 2;
+Loop Unrolls
+O que é uma thread?
+Thread é uma forma como um processo/tarefa de um programa de computador é dividido em duas ou mais tarefas que podem ser executadas concorrentemente.

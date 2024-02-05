@@ -78,7 +78,7 @@ export default function GameSelectingQuestion({
 
   const totalWidth: number = screen.width;
   const totalHeight: number = screen.height;
-  const cellWidth: number = (totalWidth - 24 * 2 - 8 * (categories.length - 1)) / 4;
+  const cellWidth: number = (totalWidth - 24 * 2 - 8 * (categories.length - 1)) / 5;
   const cellHeight: number = 140;
 
   function getPosition(cellNr: number) {
@@ -111,7 +111,7 @@ export default function GameSelectingQuestion({
         disabled={role == "staff"}
       />
 
-      <div className={`grid gap-2 grid-cols-4 text-5xl font-extrabold`}>
+      <div className={`grid gap-2 grid-cols-5 text-5xl font-extrabold`}>
         {categories.map((c, idx) => (
           <div
             className="bg-test mb-1 py-3 text-4xl rounded"

@@ -1,0 +1,8 @@
+Quem foram os criadores do sistema operacional UNIX?
+Dennis Ritchie e Ken Thompson
+Grace Hopper criou o primeiro compilador da história, qual é o nome desse compilador?
+Assembly Language Version 0 (A-0)
+Em que ano foi criado o primeiro disco rígido?
+1950
+Qual é considerada a primeira linguagem de programação criada?
+Plankalkül (Plan Calculus)

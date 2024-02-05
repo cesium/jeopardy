@@ -1,0 +1,8 @@
+Qual é o nome do algoritmo de ordenação que percorre repetidamente a lista, compara elementos adjacentes e troca-os se estiverem na ordem errada?
+Bubble Sort
+Este algoritmo é usado para encontrar o caminho mais curto num grafo com ligações positivas com peso.
+Dijkstra
+Qual é o nome do algoritmo usado para encontrar a árvore de alcance mínimo de um grafo conectado não direcionado?
+Kruskal ou Prim
+Qual é o algoritmo frequentemente usado para substituir sequências repetidas de charaters numa curta representação?
+Run-Length Encoding

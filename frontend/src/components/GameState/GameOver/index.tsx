@@ -12,11 +12,10 @@ export default function GameOver({ state, role }: GameOverProps) {
   const [playThemeSong, {stop}] = useSound("/sounds/themesong.mp3", { loop: true, volume: 0.5 });
 
   useEffect(() => {
-    playThemeSong();
-    if (state.state != 5 && role == "viewer") {
-      stop();
+    if (role === "viewer") {
+      playThemeSong();
     }
-  }, [state]);
+  }, [state, playThemeSong, role]);
 
   return (
     <div className="flex items-center h-screen justify-center text-white">
@@ -25,7 +24,7 @@ export default function GameOver({ state, role }: GameOverProps) {
           <img src="/images/seiounaosei.svg" className="w-[40rem] m-auto" />
           <h1 className="uppercase text-accent text-8xl font-extrabold text-center">
             Winners
-          </h1>  
+          </h1>
         </div>    
         <ol className="list-decimal uppercase text-xl">
           {state?.players

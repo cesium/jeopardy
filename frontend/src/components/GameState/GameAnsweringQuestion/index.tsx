@@ -5,6 +5,7 @@ import useSound from "use-sound";
 import { State } from "../../../types";
 
 import * as api from "../../../lib/api";
+import { init } from "next/dist/compiled/webpack/webpack";
 
 interface GameAnsweringQuestionProps {
   state: State;
@@ -14,6 +15,8 @@ interface GameAnsweringQuestionProps {
 function CountdownTimer({ initialSeconds, refreshRate, endSound }) {
   const [seconds, setSeconds] = useState(initialSeconds);
   const [playEndSound] = useSound("/sounds/end.mp3", { interrupt: true });
+
+  useEffect(() => setSeconds(initialSeconds), [initialSeconds]);
 
   useEffect(() => {
     if (seconds <= 0) {
@@ -103,8 +106,10 @@ export default function GameAnsweringQuestion({
           {state.currentQuestion.value}
         </p>
       </div>
-      <div className="uppercase grow items-center flex font-extrabold text-6xl w-3/4 text-center">
-        {state.currentQuestion.statement}
+      <div className="uppercase grow items-center flex font-extrabold text-6xl w-[80vw] text-center">
+        <p className="w-fit m-auto">
+          {state.currentQuestion.statement}
+        </p>        
       </div>
       {role != "viewer" && (
         <div className="uppercase grow items-center flex font-extrabold text-2xl text-accent w-3/4 text-center">

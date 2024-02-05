@@ -1,0 +1,8 @@
+Qual é o nome da máquina que Alan Turing e a sua equipa conseguiram desencriptar durante a 2º Guerra Mundial?
+Enigma
+Quem é considerado o criador do computador?
+Charles Babbage
+Qual era o nome do primeiro microcomputador, comercialmente bem-sucedido, lançado em 1977 e frequentemente associado ao nascimento da revolução do computador pessoal?
+Personal Computer da IBM
+Este matemático americano é frequentemente chamado de “Pai da Internet” por seu trabalho pioneiro no desenvolvimento do protocolo TCP/IP
+Vinton Cerf

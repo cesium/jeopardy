@@ -135,6 +135,14 @@ class GameState:
         
         self.currentPlayer = self.players[0]
         
+        
+        if not correct and len(self.alreadyAnswered) != 4:
+            self.state = States.READING_QUESTION
+        else:
+            self.alreadyAnswered = []
+            self.currentQuestion.answered = True
+            self.state = States.SELECTING_QUESTION
+
         if self.is_over():
             if(self.is_tiebreak()):
                 self.state = States.READING_QUESTION
@@ -143,12 +151,6 @@ class GameState:
                 self.currentQuestion = self.tiebreakQuestions[self.tiebreakIndex]
             else:
                 self.state = States.OVER
-        elif not correct and len(self.alreadyAnswered) != 4:
-            self.state = States.READING_QUESTION
-        else:
-            self.alreadyAnswered = []
-            self.currentQuestion.answered = True
-            self.state = States.SELECTING_QUESTION
 
     def toJSON(self):
         dict = {

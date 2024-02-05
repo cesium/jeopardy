@@ -1,0 +1,8 @@
+Diz os seguintes outputs para 5 == ‘5’ e 5 === ‘5’ em JavaScript? 
+True e False
+O que é uma lambda function em Haskell?
+É uma forma de se chamar a uma função que não tem nome
+Numa base de dados relacional, o que é uma chave primária?
+É uma coluna ou conjunto de colunas que unicamente identifica cada linha da tabela
+Que linguagem de programação foi criada pela Google em 2007 com o objetivo de melhorar a produtividade dos seus developers?
+Go
