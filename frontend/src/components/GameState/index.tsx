@@ -7,6 +7,8 @@ import { State } from "../../types";
 
 import { useEffect, useState } from "react";
 
+import useSound from "use-sound";
+
 interface GameStateProps {
   state: State;
   role: string;
@@ -19,7 +21,7 @@ export default function GameState({ state, role }: GameStateProps) {
   const [selectingQuestion, setSelectingQuestion] = useState<boolean>(false);
   const [answeringQuestion, setAnsweringQuestion] = useState<boolean>(false);
   const [gameOver, setGameOver] = useState<boolean>(false);
-  const [waiting, setWaiting] = useState<boolean>(false);
+  const [waiting, setWaiting] = useState<boolean>(false);  
 
   function getCellNr(): number {
     const cq = state.currentQuestion;
@@ -49,8 +51,6 @@ export default function GameState({ state, role }: GameStateProps) {
       default:
         break;
     }
-
-    console.log("cellNr", row * 5 + column + 1);
 
     return row * 5 + column + 1;
   }
@@ -91,7 +91,7 @@ export default function GameState({ state, role }: GameStateProps) {
         setGameOver(false);
         setWaiting(true);
         break;
-    }
+    }    
   }, [state]);
 
   return (

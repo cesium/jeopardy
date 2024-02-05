@@ -28,7 +28,7 @@ function CountdownTimer({ initialSeconds, refreshRate, endSound }) {
 
     // Clean up the timer
     return () => clearInterval(timer);
-  }, [seconds, refreshRate, endSound, playEndSound]); //TODO: Test dependencies
+  }, [seconds, refreshRate, endSound, playEndSound]);
 
   const percentage = (seconds / initialSeconds) * 100;
 
@@ -55,28 +55,34 @@ export default function GameAnsweringQuestion({
   const [started, setStarted] = useState<boolean>(false);
 
   useEffect(() => {
-    if (state.state == 4) {
+    if (role == "viewer" && state.state == 4) {
       playBuzzSound();
-      // setTimeout(() => playTimerSound(), 500);
-      // setTimeout(() => stop(), 15500);
-    } // else stop();
+      setTimeout(() => playTimerSound(), 500);
+      setTimeout(() => stop(), 7000);      
+    } else stop();
     
-  }, [state, playBuzzSound]);
+  }, [state, playBuzzSound, role]);
+
+  useEffect(() => {
+    if (role == "viewer") {
+      if (state.playCorrectSound) {
+        playCorrectSound();
+      }
+      if (state.playWrongSound) {
+        playWrongSound();
+      }
+    }
+  }, [state, playCorrectSound, playWrongSound, role]);
 
   const startQuestion = () => {
-    api.startQuestion().then((_) => setStarted(true));
+    api.startQuestion().then(_ => setStarted(true));
   };
 
   const skipQuestion = () => {
     api.skipQuestion().then(_ => setStarted(false));
   };
 
-  const submit = (res) => {
-    if (res) {
-      playCorrectSound();
-    } else {
-      playWrongSound();
-    }
+  const submit = async (res) => {
     api.answer(res).then(_ => setStarted(false));
   };
 

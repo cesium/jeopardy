@@ -39,6 +39,8 @@ class GameState:
         self.alreadyAnswered = []
         self.tiebreakIndex = -1
         self.allowedPlayers = []
+        self.playCorrectSound = False
+        self.playWrongSound = False
 
     def initQuestions(self):
         id = 0
@@ -116,12 +118,16 @@ class GameState:
             raise ValueError("No player chosen yet")
         
         self.currentQuestion.answered = True
+        self.playCorrectSound = False
+        self.playWrongSound = False
 
         if correct:
-            self.oneAnsweredCorrectly = True
+            self.playCorrectSound = True
+            self.oneAnsweredCorrectly = True            
             self.selectingPlayer = self.players.index(self.currentPlayer)
             self.currentPlayer.addPoints(self.currentQuestion.value)
         else:
+            self.playWrongSound = True
             self.alreadyAnswered = self.alreadyAnswered + [self.players.index(self.currentPlayer)]
             if self.tiebreakIndex == -1:
                 self.currentPlayer.addPoints(-1 * self.currentQuestion.value)
@@ -152,7 +158,9 @@ class GameState:
             "currentQuestion": None if self.currentQuestion is None else self.currentQuestion.__dict__,
             "currentPlayer": None if self.currentPlayer is None else self.currentPlayer.__dict__,
             "selectingPlayer": self.selectingPlayer,
-            "alreadyAnswered": self.alreadyAnswered
+            "alreadyAnswered": self.alreadyAnswered,
+            "playCorrectSound": self.playCorrectSound,
+            "playWrongSound": self.playWrongSound,
         }
         return json.dumps(dict)
 

@@ -72,6 +72,8 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         content = '{"error": "Not found"}'
 
         with globals.state_condition:
+            globals.state.playCorrectSound = False
+            globals.state.playWrongSound = False
             if self.path == "/answer":
                 status, content = httpcontroller.post_answer(self.__post_body__())
             elif self.path == "/skip":

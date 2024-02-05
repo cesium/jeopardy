@@ -18,4 +18,8 @@ export type State = {
   state: number;
   currentQuestion: Question;
   currentPlayer: Player;
+  selectingPlayer: number;
+  alreadyAnswered: number[];
+  playCorrectSound: boolean;
+  playWrongSound: boolean;
 };
