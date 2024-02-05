@@ -18,9 +18,11 @@ def get_pressed(state):
     ls = []
     for i in range(0,4):
         if state[i]["red"]:
-            print(globals.state.alreadyAnswered)
-            print(globals.state.allowedPlayers)
-            print(i)
+            print("=====================================")
+            print(f"Already Answered: {globals.state.alreadyAnswered}")
+            print(f"Allowed: {globals.state.allowedPlayers}")
+            print(f"Player: {i}")
+            print("=====================================")
         
         if state[i]["red"] and i not in globals.state.alreadyAnswered and i in globals.state.allowedPlayers:
             ls = ls + [i]
@@ -90,6 +92,6 @@ def buzz_thread():
                     elif not reading:
                         print("Not reading")
                         for p in pressed:
-                            timeouts[p] = time.time_ns() + 1e10
+                            timeouts[p] = time.time_ns() + 5e9
                     
         time.sleep(0.001)

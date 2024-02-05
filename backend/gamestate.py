@@ -117,7 +117,6 @@ class GameState:
         elif self.currentPlayer is None:
             raise ValueError("No player chosen yet")
         
-        self.currentQuestion.answered = True
         self.playCorrectSound = False
         self.playWrongSound = False
 
@@ -148,6 +147,7 @@ class GameState:
             self.state = States.READING_QUESTION
         else:
             self.alreadyAnswered = []
+            self.currentQuestion.answered = True
             self.state = States.SELECTING_QUESTION
 
     def toJSON(self):
