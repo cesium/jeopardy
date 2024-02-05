@@ -37,7 +37,7 @@ def buzz_notification_thread():
         with globals.buzz_condition:
             globals.buzz_condition.wait()
             reading = True
-            readingUntil = time.time_ns() + 5e9
+            readingUntil = time.time_ns() + 1e10
 
 def buzz_thread():
     global reading
@@ -90,6 +90,6 @@ def buzz_thread():
                     elif not reading:
                         print("Not reading")
                         for p in pressed:
-                            timeouts[p] = time.time_ns() + 5e9
+                            timeouts[p] = time.time_ns() + 1e10
                     
         time.sleep(0.001)
