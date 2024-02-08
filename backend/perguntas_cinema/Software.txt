@@ -1,0 +1,8 @@
+O que significa a sigla WWW?
+World Wide Web
+Qual é o nome do programa que permite navegar na internet?
+Navegador ou browser
+Qual é o nome do sistema operativo mais usado nos computadores pessoais?
+Windows
+Qual é o nome da linguagem de programação que foi criada por Guido van Rossum em 1991?
+Python

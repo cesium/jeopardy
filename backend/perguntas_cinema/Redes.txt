@@ -1,0 +1,8 @@
+O que significa a sigla IP?
+Internet Protocol
+Qual é o nome do dispositivo que permite interligar vários computadores numa rede local?
+Switch ou hub
+Qual é o nome do protocolo que permite enviar e receber e-mails?
+SMTP ou POP3
+Qual é o nome da técnica que consiste em dividir uma rede em sub-redes mais pequenas?
+Subnetting

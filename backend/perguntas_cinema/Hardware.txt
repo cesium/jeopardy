@@ -1,0 +1,8 @@
+Qual é o nome do componente que processa as instruções do computador?
+CPU
+Qual é a unidade de medida da velocidade de um processador?
+GHz
+Qual é a diferença entre memória RAM e memória ROM?
+A memória RAM é volátil e pode ser alterada, a memória ROM é permanente e não pode ser modificada.
+Qual é o nome do conector que permite ligar um monitor ao computador através de um cabo de vídeo analógico?
+VGA

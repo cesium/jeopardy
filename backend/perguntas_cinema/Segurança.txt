@@ -1,0 +1,8 @@
+O que significa a sigla VPN?
+Virtual Private Network
+Qual é o nome do programa malicioso que se propaga através de redes infectando outros computadores?
+Vírus ou worm
+Qual é o nome do processo que consiste em cifrar uma mensagem para impedir que seja lida por terceiros?
+Criptografia ou encriptação
+Qual é o nome da técnica que consiste em tentar adivinhar uma senha através de tentativas sucessivas?
+Brute force ou força bruta
