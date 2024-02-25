@@ -113,8 +113,8 @@ export default function GameAnsweringQuestion({
         </p>{
           state.currentQuestion.image != "" && (
             <Image
-              src={`/images/${state.currentQuestion.image}`}
-              alt="arrow"
+              src={`/question_images/${state.currentQuestion.image}`}
+              alt="Question Image"
               width={250}
               height={250}
               className="p-6"/>
