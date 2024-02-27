@@ -1,0 +1,76 @@
+História
+
+100
+
+Em que ano ocorreu a primeira edição da SEI (Semana de Engenharia Informática)?
+2015
+
+200
+
+Nos 9 anos de existência da SEI, qual foi o único ano em que o evento não se realizou?
+2020
+
+300
+
+Por que nome era conhecida a SEI antes da sua reestruturação?
+Semana da LEI
+
+400
+
+Quem era o presidente da direção responsável pela fundação do evento que mais tarde viria a ser conhecido como SEI?
+Roberto Machado
+
+Speakers
+
+100
+
+Nomeia 3 dos 4 professores que participaram na tertúlia de inteligência artificial, no 2º dia da SEI'24
+José Ramalho (Ramalho), José Oliveira (JNO), Orlando Belo (Belo) e Bruno Fernandes
+
+200
+
+Qual o nome do speaker que esteve presente no primeiro dia da SEI'24 e que já pertenceu ao CeSIUM? Que empresa representava?
+Nelson Estevão, Marmela
+
+300
+
+Que empresa representava Aleksey Kladov, na sua talk sobre Rust e Zig?
+TigerBeetle
+
+400
+
+Qual o nome do speaker que bebeu uma cerveja com o Mário no final da sua talk?
+Ricardo Mota
+
+Sponsors
+
+100
+
+Qual dos seguintes NÃO era um Gold Sponsor na SEI'24? Accenture, Critical TechWorks, Deloitte.
+Deloitte
+
+200
+
+
+
+300
+
+Que duas empresas apresentaram conflitos de interesse durante o almoço da SEI'24?
+Uphold e SEEGNO
+
+400
+
+A empresa DTX foi Bronze Sponsor na SEI'24. O que significa a sigla DTX?
+Digital Transformation CoLab
+
+Prémios
+
+100
+
+200
+
+300
+
+400
+
+
