@@ -6,6 +6,7 @@ import { State } from "../../../types";
 
 import * as api from "../../../lib/api";
 import { init } from "next/dist/compiled/webpack/webpack";
+import Image from "next/image";
 
 interface GameAnsweringQuestionProps {
   state: State;
@@ -106,10 +107,18 @@ export default function GameAnsweringQuestion({
           {state.currentQuestion.value}
         </p>
       </div>
-      <div className="uppercase grow items-center flex font-extrabold text-6xl w-[80vw] text-center">
-        <p className="w-fit m-auto">
+      <div className="uppercase grow items-center flex flex-col font-extrabold w-[80vw] text-center space-y-16">
+        {
+          state.currentQuestion.image != "" && (
+            <img
+              src={`/images/questions/${state.currentQuestion.image}`}
+              alt="Question Image"
+              className={`${role == "staff" ? 'h-[16rem]' : 'h-[26rem]'} rounded-xl`}/>
+          )
+        }
+        <p className={`w-fit m-auto ${state.currentQuestion.image != "" ? 'text-4xl' : 'text-6xl'}`}>
           {state.currentQuestion.statement}
-        </p>        
+        </p>
       </div>
       {role != "viewer" && (
         <div className="uppercase grow items-center flex font-extrabold text-2xl text-accent w-3/4 text-center">

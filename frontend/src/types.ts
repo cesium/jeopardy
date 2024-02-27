@@ -7,6 +7,7 @@ export type Question = {
   id: number;
   statement: string;
   answer: string;
+  image: string;
   value: number;
   category: string;
   answered: boolean;
