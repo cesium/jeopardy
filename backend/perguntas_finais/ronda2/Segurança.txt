@@ -1,8 +1,11 @@
 Qual é o termo usado para descrever um ataque em que um invasor infiltra-se numa conversa entre dois sistemas e altera as mensagens que estão a ser trocadas?
 Man-in-the-Middle (Homem no Meio)
+
 O que é um ransomware e o que ele faz?
 Ransomware é um tipo de malware projetado para bloquear o acesso a arquivos ou sistemas de computador, geralmente por meio de criptografia
+
 Que nome se dá a um ataque que aproveita a falta de sanitização de inputs utilizados em interrogações a bases de dados SQL?
 SQL Injection
+
 Qual é a técnica de criptografia que usa uma única chave para cifrar e decifrar informações, ao contrário da abordagem de chaves públicas e privadas?
 Criptografia de Chave Simétrica

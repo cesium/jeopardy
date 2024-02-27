@@ -73,10 +73,10 @@ export default function GameState({ state, role }: GameStateProps) {
         setTimeout(() => {
           setStartAnimation(false);
           setSelectingQuestion(false);
-        }, 2200);
-        setAnsweringQuestion(true);
-        setGameOver(false);
-        setWaiting(false);
+          setAnsweringQuestion(true);
+          setGameOver(false);
+          setWaiting(false);
+        }, 2200);        
         break;
       case 5:
         setSelectingQuestion(false);

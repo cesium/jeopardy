@@ -51,10 +51,11 @@ class GameState:
             while True:
                 question = f.readline()
                 answer = f.readline()
+                image = f.readline()
                 value += 100
                 if not question: #TODO: validar número de linhas par
                     break
-                self.questions.append(Question(id, question.strip(), answer.strip(), value, category))
+                self.questions.append(Question(id, question.strip(), answer.strip(),image.strip(), value, category))
                 id += 1
 
         f = open("backend/perguntas/tiebreak.txt", "r", encoding="utf-8")
@@ -63,7 +64,7 @@ class GameState:
             answer = f.readline()
             if not question: #TODO: validar número de linhas par
                 break
-            self.tiebreakQuestions.append(Question(id, question.strip(), answer.strip(), 100, "Tiebreak"))
+            self.tiebreakQuestions.append(Question(id, question.strip(), answer.strip(), image.strip(), 100, "Tiebreak"))
             id += 1
 
     def selectQuestion(self, id):
