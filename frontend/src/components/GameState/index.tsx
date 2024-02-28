@@ -64,8 +64,6 @@ export default function GameState({ state, role }: GameStateProps) {
         setWaiting(false);
         break;
       case 2:
-      case 3:
-      case 4:
         setAnimationPosition(getCellNr());
         setTimeout(() => {
           setStartAnimation(true);
@@ -77,6 +75,10 @@ export default function GameState({ state, role }: GameStateProps) {
           setGameOver(false);
           setWaiting(false);
         }, 2200);        
+        break;
+      case 3:
+        break;
+      case 4:
         break;
       case 5:
         setSelectingQuestion(false);
