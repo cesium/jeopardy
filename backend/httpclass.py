@@ -8,10 +8,9 @@ def playertodic(player):
 
 def jsonstate():
     dicionario = {
-        
-        "currentPlayer": state.currentPlayer,
-        "state":state.state,     
-        "players":[playertodic(p)for p in state.players]
+        "currentPlayer": globals.state.get_current_player().toDict(),
+        "state":globals.state.state,     
+        "players":[playertodic(p)for p in globals.state.playersController.players]
     }
     return json.dumps(dicionario)
 
@@ -51,7 +50,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
             elif self.path.startswith("/question/"):
                 id = self.path.removeprefix("/question/")
                 status = 200
-                content = json.dumps(globals.state.questions[int(id)].__dict__)
+                content = json.dumps(globals.state.questions[int(id)].toDict())
 
         # Set response status code
         self.send_response(status)

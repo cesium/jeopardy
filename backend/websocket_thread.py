@@ -4,23 +4,21 @@ import websockets
 from websockets import WebSocketServerProtocol
 import threading
 import globals
+import time
 
 logging.basicConfig(level=logging.INFO)
 
 
 class Server:
 
-    clients = set()
-    logging.info(f'starting up ...')
-
     def __init__(self):
-        logging.info(f'init happened ...')
+        self.clients = set()
         
     async def register(self, ws: WebSocketServerProtocol) -> None:
         self.clients.add(ws)
         logging.info(f'{ws.remote_address} connects')
         with globals.state_condition:
-            await ws.send(globals.state.toJSON())
+            await ws.send(globals.state.to_JSON())
 
     async def unregister(self, ws: WebSocketServerProtocol) -> None:
         self.clients.remove(ws)
@@ -53,7 +51,7 @@ async def checkAndSend(server,state):
     # check something
     # send message
     logging.info("in check and send")
-    await server.send_to_clients(state.toJSON())
+    await server.send_to_clients(state.to_JSON())
 
 # helper routine to allow thread to call async function
 def between_callback(server,counter):
@@ -63,14 +61,15 @@ def between_callback(server,counter):
     loop.close()
 
 
-def websockets_thread():
+def websockets_thread(host :str ,port : int):
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
-
+    
     # start server
     server = Server()
-    start_server = websockets.serve(server.ws_handler,'0.0.0.0',8001)
+    start_server = websockets.serve(server.ws_handler,host,port)
     counter = 0 
+    print(f"WS Server running on {host}:{port}")
 
     # start timer thread
     threading.Thread(target=between_callback,args=(server,counter,)).start()

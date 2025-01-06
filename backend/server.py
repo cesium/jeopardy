@@ -2,11 +2,8 @@ from http.server import HTTPServer
 from httpclass import SimpleHTTPRequestHandler
 
 
-def webserver_thread():
+def webserver_thread(host :str ,port : int):
     # Set the host and port for the server
-    host = '0.0.0.0'
-    port = 8000
-
     # Create an instance of HTTPServer with the defined host and port, and the custom handler
     httpd = HTTPServer((host, port), SimpleHTTPRequestHandler)
     print(f"Server running on {host}:{port}")
