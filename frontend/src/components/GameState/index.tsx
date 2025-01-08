@@ -2,12 +2,8 @@ import GameAnsweringQuestion from "./GameAnsweringQuestion";
 import GameSelectingQuestion from "./GameSelectingQuestion";
 import GameWaiting from "./GameWaiting";
 import GameOver from "./GameOver";
-
 import { State } from "../../types";
-
-import { useEffect, useState } from "react";
-
-import useSound from "use-sound";
+import { useCallback, useEffect, useState } from "react";
 
 interface GameStateProps {
   state: State;
@@ -21,9 +17,9 @@ export default function GameState({ state, role }: GameStateProps) {
   const [selectingQuestion, setSelectingQuestion] = useState<boolean>(false);
   const [answeringQuestion, setAnsweringQuestion] = useState<boolean>(false);
   const [gameOver, setGameOver] = useState<boolean>(false);
-  const [waiting, setWaiting] = useState<boolean>(false);  
+  const [waiting, setWaiting] = useState<boolean>(false);
 
-  function getCellNr(): number {
+  const getCellNr = useCallback(() => {
     const cq = state.currentQuestion;
     const value = cq.value;
     const categories: string[] = [
@@ -53,7 +49,7 @@ export default function GameState({ state, role }: GameStateProps) {
     }
 
     return row * 5 + column + 1;
-  }
+  }, [state]);
 
   useEffect(() => {
     switch (state.state) {
@@ -74,7 +70,7 @@ export default function GameState({ state, role }: GameStateProps) {
           setAnsweringQuestion(true);
           setGameOver(false);
           setWaiting(false);
-        }, 2200);        
+        }, 2200);
         break;
       case 3:
         break;
@@ -93,8 +89,8 @@ export default function GameState({ state, role }: GameStateProps) {
         setGameOver(false);
         setWaiting(true);
         break;
-    }    
-  }, [state]);
+    }
+  }, [state, getCellNr]);
 
   return (
     <>

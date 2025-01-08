@@ -37,7 +37,7 @@ const Viewer = () => {
       {!interacted && (
         <button
           className="text-white bg-accent m-auto block mt-12 py-2 px-4 text-3xl font-extrabold"
-          onClick={_ => setInteracted(true)}
+          onClick={(_) => setInteracted(true)}
         >
           JOGAR
         </button>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 import { State, Question } from "../../../types";
 
@@ -78,21 +78,25 @@ export default function GameSelectingQuestion({
 
   const totalWidth: number = screen.width;
   const totalHeight: number = screen.height;
-  const cellWidth: number = (totalWidth - 24 * 2 - 8 * (categories.length - 1)) / 5;
+  const cellWidth: number =
+    (totalWidth - 24 * 2 - 8 * (categories.length - 1)) / 5;
   const cellHeight: number = 140;
 
-  function getPosition(cellNr: number) {
-    const row = Math.ceil(cellNr / 5) - 1;
-    const column = cellNr % 5 === 0 ? 4 : (cellNr % 5) - 1;
-    const left = 24 + column * cellWidth + column * 8;
-    const top = 24 + 64 + 12 + row * cellHeight + row * 8;
-    setLeft(left);
-    setTop(top);
-  }
+  const getPosition = useCallback(
+    (cellNr: number) => {
+      const row = Math.ceil(cellNr / 5) - 1;
+      const column = cellNr % 5 === 0 ? 4 : (cellNr % 5) - 1;
+      const left = 24 + column * cellWidth + column * 8;
+      const top = 24 + 64 + 12 + row * cellHeight + row * 8;
+      setLeft(left);
+      setTop(top);
+    },
+    [cellWidth],
+  );
 
   useEffect(() => {
     getPosition(animationPosition);
-  }, [animationPosition]);
+  }, [animationPosition, getPosition]);
 
   const setQuestion = (id) => {
     api.setQuestion(id);

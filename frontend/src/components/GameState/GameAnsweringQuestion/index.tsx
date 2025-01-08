@@ -62,10 +62,9 @@ export default function GameAnsweringQuestion({
     if (role == "viewer" && state.state == 4) {
       playBuzzSound();
       setTimeout(() => playTimerSound(), 500);
-      setTimeout(() => stop(), 7000);      
+      setTimeout(() => stop(), 7000);
     } else stop();
-    
-  }, [state, playBuzzSound, role]);
+  }, [state, playBuzzSound, role, playTimerSound, stop]);
 
   useEffect(() => {
     if (role == "viewer") {
@@ -79,15 +78,15 @@ export default function GameAnsweringQuestion({
   }, [state, playCorrectSound, playWrongSound, role]);
 
   const startQuestion = () => {
-    api.startQuestion().then(_ => setStarted(true));
+    api.startQuestion().then((_) => setStarted(true));
   };
 
   const skipQuestion = () => {
-    api.skipQuestion().then(_ => setStarted(false));
+    api.skipQuestion().then((_) => setStarted(false));
   };
 
   const submit = async (res) => {
-    api.answer(res).then(_ => setStarted(false));
+    api.answer(res).then((_) => setStarted(false));
   };
 
   return (
@@ -108,15 +107,16 @@ export default function GameAnsweringQuestion({
         </p>
       </div>
       <div className="uppercase grow items-center flex flex-col font-extrabold w-[80vw] text-center space-y-16">
-        {
-          state.currentQuestion.image != "" && (
-            <img
-              src={`/images/questions/${state.currentQuestion.image}`}
-              alt="Question Image"
-              className={`${role == "staff" ? 'h-[16rem]' : 'h-[26rem]'} rounded-xl`}/>
-          )
-        }
-        <p className={`w-fit m-auto ${state.currentQuestion.image != "" ? 'text-4xl' : 'text-6xl'}`}>
+        {state.currentQuestion.image != "" && (
+          <img
+            src={`/images/questions/${state.currentQuestion.image}`}
+            alt="Question Image"
+            className={`${role == "staff" ? "h-[16rem]" : "h-[26rem]"} rounded-xl`}
+          />
+        )}
+        <p
+          className={`w-fit m-auto ${state.currentQuestion.image != "" ? "text-4xl" : "text-6xl"}`}
+        >
           {state.currentQuestion.statement}
         </p>
       </div>
