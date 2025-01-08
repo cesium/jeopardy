@@ -486,7 +486,7 @@ class GameState:
         Set both sound playing to false
         """
         self.play_correct_sound = False
-        self.play_wrong_sound = True
+        self.play_wrong_sound = False
 
     def get_question(self, idx: int) -> Question:
         """get a question by id
