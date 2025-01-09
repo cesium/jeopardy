@@ -13,10 +13,9 @@ module.exports = {
           "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
       },
       colors: {
-        primary: "#04041c",
-        secondary: "#080836",
-        accent: "#ff800d",
-        test: "#2b09dc",
+        background: "#04041c",
+        primary: "#ffdb0d",
+        accent: "#300bee",
       },
       fontFamily: {
         sei: ["var(--font-sei)"],
@@ -25,5 +24,10 @@ module.exports = {
       },
     },
   },
+  safelist: [
+    {
+      pattern: /grid-cols-(\d)/,
+    },
+  ],
   plugins: [],
 };

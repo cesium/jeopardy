@@ -25,7 +25,7 @@ export default function GameOver({ state, role }: GameOverProps) {
       <div className="block text-left space-y-24">
         <div className="space-y-6">
           <img src="/images/seiounaosei.svg" className="w-[40rem] m-auto" />
-          <h1 className="uppercase text-accent text-8xl font-extrabold text-center">
+          <h1 className="uppercase text-primary text-8xl font-extrabold text-center">
             Winners
           </h1>
         </div>

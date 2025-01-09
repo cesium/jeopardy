@@ -1,30 +1,13 @@
 import { useState, useEffect, useCallback } from "react";
-
-import { State, Question } from "../../../types";
-
+import { State } from "../../../types";
+import { processState } from "../../../lib/utils";
 import * as api from "../../../lib/api";
-
-function processState(state: State): [string[], Question[]] {
-  const categories: string[] = [
-    ...new Set(state.questions.map((q) => q.category)),
-  ];
-
-  const questions: Question[] = state.questions.sort((a, b) => {
-    const res = a.value - b.value;
-    if (res == 0) {
-      return categories.indexOf(a.category) - categories.indexOf(b.category);
-    } else {
-      return res;
-    }
-  });
-
-  return [categories, questions];
-}
 
 interface GameSelectingQuestionProps {
   state: State;
   role: string;
-  startAnimation: boolean;
+  startOpenAnimation: boolean;
+  inView: boolean;
   animationPosition: number;
 }
 
@@ -38,60 +21,66 @@ const Animation = ({
   totalHeight,
   disabled,
 }) => {
+  console.log("left", left);
+  console.log("top", top);
+
   const startStyle: React.CSSProperties = {
-    position: "absolute",
-    zIndex: 100,
     left: left,
     top: top,
     width: cellWidth,
     height: cellHeight,
-    transition: "all 1s ease-in-out",
   };
 
   const afterStyle: React.CSSProperties = {
-    position: "absolute",
-    zIndex: 100,
     left: 0,
     top: 0,
     width: totalWidth,
     height: totalHeight,
-    transition: "all 1s ease-in-out",
   };
 
-  return (
-    <div
-      className={`${disabled ? "hidden" : ""} ${start ? "bg-primary border-none" : "border-white/70 border-2 bg-transparent"} rounded`}
-      style={start ? afterStyle : startStyle}
-    />
-  );
+  if (!(left === 0 || top === 0))
+    return (
+      <>
+        <div
+          className={`${disabled ? "hidden" : ""} ${start ? "opacity-100" : ""} rounded-md transition-all duration-1000 z-50 bg-background opacity-0 absolute`}
+          style={start ? afterStyle : startStyle}
+        />
+        <div
+          className={`${disabled ? "hidden" : ""} ${start ? "border-none" : ""} border border-primary animate-pulse absolute rounded-md transition-all duration-1000 z-50`}
+          style={startStyle}
+        />
+      </>
+    );
 };
 
 export default function GameSelectingQuestion({
   state,
   role,
-  startAnimation,
+  startOpenAnimation,
+  inView,
   animationPosition,
 }: GameSelectingQuestionProps) {
-  const [categories, questionsPerAmount] = processState(state);
+  const [categories, points, questions] = processState(state);
   const [left, setLeft] = useState<number>(0);
   const [top, setTop] = useState<number>(0);
 
+  const columnsNr: number = categories.length;
   const totalWidth: number = screen.width;
   const totalHeight: number = screen.height;
   const cellWidth: number =
-    (totalWidth - 24 * 2 - 8 * (categories.length - 1)) / 5;
+    (totalWidth - 24 * 2 - 8 * (columnsNr - 1)) / columnsNr;
   const cellHeight: number = 140;
 
   const getPosition = useCallback(
     (cellNr: number) => {
-      const row = Math.ceil(cellNr / 5) - 1;
-      const column = cellNr % 5 === 0 ? 4 : (cellNr % 5) - 1;
+      const row = Math.floor(cellNr / columnsNr);
+      const column = cellNr % columnsNr;
       const left = 24 + column * cellWidth + column * 8;
       const top = 24 + 64 + 12 + row * cellHeight + row * 8;
       setLeft(left);
       setTop(top);
     },
-    [cellWidth],
+    [cellWidth, columnsNr],
   );
 
   useEffect(() => {
@@ -103,9 +92,11 @@ export default function GameSelectingQuestion({
   };
 
   return (
-    <div className="p-6 uppercase text-center select-none">
+    <div
+      className={`flex flex-col p-6 uppercase text-center select-none transition-all duration-500 ${inView ? "opacity-100" : "opacity-0"} h-screen`}
+    >
       <Animation
-        start={startAnimation}
+        start={startOpenAnimation}
         left={left}
         top={top}
         cellWidth={cellWidth}
@@ -115,20 +106,22 @@ export default function GameSelectingQuestion({
         disabled={role == "staff"}
       />
 
-      <div className={`grid gap-2 grid-cols-5 text-5xl font-extrabold`}>
+      <div
+        className={`grid gap-2 grid-cols-${columnsNr} text-5xl font-extrabold`}
+      >
         {categories.map((c, idx) => (
           <div
-            className="bg-test mb-1 py-3 text-4xl rounded"
+            className="bg-accent mb-1 py-3 text-4xl rounded-md"
             key={`cat-${idx}`}
           >
             <p className="drop-shadow-md">{c}</p>
           </div>
         ))}
-        {questionsPerAmount.map((q, idx) => (
+        {questions.map((q, idx) => (
           <button
-            className={`bg-gradient-to-br from-test to-test/50 text-accent p-10 rounded flex space-x-2 place-content-center h-[140px] items-center ${q.answered && "opacity-40"}`}
+            className={`bg-gradient-to-br from-accent/90 to-accent/40 backdrop-blur-md text-primary p-10 rounded-md flex space-x-2 place-content-center h-[140px] items-center ${q.answered && "opacity-40"} ${!q.answered && role === "staff" && "hover:border"} border-primary`}
             key={`question-${idx}`}
-            disabled={q.answered || role != "staff"}
+            disabled={q.answered || role !== "staff"}
             onClick={(_) => setQuestion(q.id)}
           >
             {!q.answered && (
@@ -139,7 +132,7 @@ export default function GameSelectingQuestion({
           </button>
         ))}
       </div>
-      <div className="flex items-center justify-center mt-12">
+      <div className="flex items-center justify-center h-full">
         {state.players.map((p, idx) => (
           <div key={`player-${idx}`} className="mx-12 uppercase">
             <p className="font-bold text-4xl">{p.name}</p>
