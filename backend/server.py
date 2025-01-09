@@ -61,6 +61,7 @@ async def catch_multiple_exceptions(_: Request, exc: Exception) -> JSONResponse:
             content={"detail": str(exc)},
         )
     # Handle other exceptions (optional)
+    logging.error(exc_info=str(exc))
     return JSONResponse(
         status_code=500,
         content={"detail": "An unexpected error occurred."},
