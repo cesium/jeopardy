@@ -8,7 +8,7 @@ import requests
 import shared_globals
 
 
-TIMEOUT = int(os.getenv("TIMEOUT", "5")) * 1e9
+BUZZ_PENALTY_TIMEOUT = int(os.getenv("BUZZ_PENALTY_TIMEOUT", "5")) * 1e9
 TIME_TO_ANSWER = int(os.getenv("TIME_TO_ANSWER", "20")) * 1e9
 SERVER_PORT = int(os.getenv("SERVER_PORT", "8000"))
 
@@ -115,11 +115,11 @@ Player: {i}
         self.button_state[3]["orange"] = (data[4] & 0x04) != 0  # orange
         self.button_state[3]["blue"] = (data[4] & 0x08) != 0  # blue
 
-    def __is_timed_out(self, player):
+    def __is_timed_out(self, controller):
         """
-        Returns if the player has timed out
+        Returns if the controller is in timeout
         """
-        return self.timeouts[player] >= time.time_ns()
+        return self.timeouts[controller] >= time.time_ns()
 
     def _handle_buzz(self):
         """
@@ -130,13 +130,13 @@ Player: {i}
         if pressed:
             if self.reading:
                 if self.reading_until >= time.time_ns():
-                    for player in pressed:
-                        if self.__is_timed_out(player):
+                    for controller in pressed:
+                        if self.__is_timed_out(controller):
                             print("Timeout")
                         else:
                             requests.post(
                                 f"http://localhost:{SERVER_PORT}/buzz",
-                                json={"player": player},
+                                json={"player": controller},
                                 timeout=10000,
                             )
                             self.reading = False
@@ -144,7 +144,7 @@ Player: {i}
             else:
                 print("Not reading")
                 for p in pressed:
-                    self.timeouts[p] = time.time_ns() + TIMEOUT
+                    self.timeouts[p] = time.time_ns() + BUZZ_PENALTY_TIMEOUT
 
     def buzz_thread(self):
         """
