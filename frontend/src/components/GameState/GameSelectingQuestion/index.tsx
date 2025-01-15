@@ -21,9 +21,6 @@ const Animation = ({
   totalHeight,
   disabled,
 }) => {
-  console.log("left", left);
-  console.log("top", top);
-
   const startStyle: React.CSSProperties = {
     left: left,
     top: top,
@@ -80,7 +77,7 @@ export default function GameSelectingQuestion({
       setLeft(left);
       setTop(top);
     },
-    [cellWidth, columnsNr],
+    [cellWidth, columnsNr]
   );
 
   useEffect(() => {
