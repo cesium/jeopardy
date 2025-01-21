@@ -26,14 +26,17 @@ function PlayerInput({ id, onChange }) {
 }
 
 function GameWaitingNonStaff({ state }: GameWaitingProps) {
-  const [playThemeSong, {stop}] = useSound("/sounds/themesong.mp3", { loop: true, volume: 0.5 });
+  const [playThemeSong, { stop }] = useSound("/sounds/themesong.mp3", {
+    loop: true,
+    volume: 0.5,
+  });
 
   useEffect(() => {
     playThemeSong();
     if (state.state != 0) {
       stop();
     }
-  }, [state, playThemeSong]);
+  }, [state, playThemeSong, stop]);
 
   return (
     <div className="flex items-center h-screen justify-center text-white">
@@ -48,7 +51,7 @@ function GameWaitingNonStaff({ state }: GameWaitingProps) {
 
 function GameWaitingStaff({ state }: GameWaitingProps) {
   const [names, setNames] = useState<string[]>(["", "", "", ""]);
-  
+
   const updateNames = (n: string, i: number) => {
     let newNames = [...names];
     newNames[i] = n;

@@ -9,7 +9,10 @@ interface GameOverProps {
 }
 
 export default function GameOver({ state, role }: GameOverProps) {
-  const [playThemeSong, {stop}] = useSound("/sounds/themesong.mp3", { loop: true, volume: 0.5 });
+  const [playThemeSong, { stop }] = useSound("/sounds/themesong.mp3", {
+    loop: true,
+    volume: 0.5,
+  });
 
   useEffect(() => {
     if (role === "viewer") {
@@ -22,15 +25,18 @@ export default function GameOver({ state, role }: GameOverProps) {
       <div className="block text-left space-y-24">
         <div className="space-y-6">
           <img src="/images/seiounaosei.svg" className="w-[40rem] m-auto" />
-          <h1 className="uppercase text-accent text-8xl font-extrabold text-center">
+          <h1 className="uppercase text-primary text-8xl font-extrabold text-center">
             Winners
           </h1>
-        </div>    
+        </div>
         <ol className="list-decimal uppercase text-xl">
           {state?.players
             ?.sort((a, b) => b.balance - a.balance)
             .map((p, idx) => (
-              <li key={idx} className={`${idx == 0 && "text-8xl"} ${idx == 1 && "text-7xl"} ${idx == 2 && "text-6xl"} text-5xl my-2 flex place-content-between space-x-32`}>
+              <li
+                key={idx}
+                className={`${idx == 0 && "text-8xl"} ${idx == 1 && "text-7xl"} ${idx == 2 && "text-6xl"} text-5xl my-2 flex place-content-between space-x-32`}
+              >
                 <b>{p.name}</b>
                 <span>{p.balance} tokens</span>
               </li>

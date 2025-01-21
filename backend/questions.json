@@ -1,0 +1,196 @@
+{
+    "regular": {
+        "Algoritmos": [
+            {
+                "question": "O algoritmo de ordenação que divide um array em duas metades, ordena recursivamente cada metade e depois combina as partes ordenadas é o algoritmo de ____________ ?",
+                "answer": "Merge Sort",
+                "image": "",
+                "value": 100
+            },
+            {
+                "question": "Um algoritmo de busca que começa na raiz de uma árvore ou grafo e explora todos os vizinhos antes de retroceder para explorar outros ramos é o algoritmo de _______.",
+                "answer": "DFS (Depth First Search)",
+                "image": "",
+                "value": 200
+            },
+            {
+                "question": "Que nome é dado à seguinte técnica?  for(int i=0; i < 18 ; i+=2) a[i] = 1; a[i+1] = 2;",
+                "answer": "Loop Unrolls",
+                "image": "",
+                "value": 300
+            },
+            {
+                "question": "O que é uma thread?",
+                "answer": "Thread é uma forma como um processo/tarefa de um programa de computador é dividido em duas ou mais tarefas que podem ser executadas concorrentemente.",
+                "image": "",
+                "value": 400
+            },
+            {
+                "question": "Diz os seguintes outputs para 5 == ‘5’ e 5 === ‘5’ em JavaScript?, ",
+                "answer": " concorrentemente.",
+                "image": "",
+                "value": 500
+            }
+        ],
+        "Hardware": [
+            {
+                "question": "O que significa GPU?",
+                "answer": "Graphics Processing Units",
+                "image": "",
+                "value": 100
+            },
+            {
+                "question": "O que é overclocking?",
+                "answer": "Overclocking é o processo de aumentar a velocidade de operação de um componente de hardware, para obter um desempenho melhor do que o especificado pelo fabricante.",
+                "image": "",
+                "value": 200
+            },
+            {
+                "question": "O que é um socket de CPU?",
+                "answer": "Um socket de CPU é o local na placa-mãe onde a CPU é instalada",
+                "image": "",
+                "value": 300
+            },
+            {
+                "question": "Qual é a plataforma de prototipagem eletrónica de baixo custo criada em 2005 por Massimo Banzi e David Cuartielles?",
+                "answer": "Arduino",
+                "image": "",
+                "value": 400
+            },
+            {
+                "question": "Diz os seguintes outputs para 5 == ‘5’ e 5 === ‘5’ em JavaScript?, ",
+                "answer": " concorrentemente.",
+                "image": "",
+                "value": 500
+            }
+        ],
+        "Linguagens": [
+            {
+                "question": "Diz os seguintes outputs para 5 == ‘5’ e 5 === ‘5’ em JavaScript?, ",
+                "answer": "True e False",
+                "image": "",
+                "value": 100
+            },
+            {
+                "question": "O que é uma lambda function em Haskell?",
+                "answer": "É uma forma de se chamar a uma função que não tem nome",
+                "image": "",
+                "value": 200
+            },
+            {
+                "question": "Numa base de dados relacional, o que é uma chave primária?",
+                "answer": "É uma coluna ou conjunto de colunas que unicamente identifica cada linha da tabela",
+                "image": "",
+                "value": 300
+            },
+            {
+                "question": "Que linguagem de programação foi criada pela Google em 2007 com o objetivo de melhorar a produtividade dos seus developers?",
+                "answer": "Go",
+                "image": "",
+                "value": 400
+            },
+            {
+                "question": "Diz os seguintes outputs para 5 == ‘5’ e 5 === ‘5’ em JavaScript?, ",
+                "answer": " concorrentemente.",
+                "image": "",
+                "value": 500
+            }
+        ],
+        "Pioneiros": [
+            {
+                "question": "uem foram os criadores do sistema operacional UNIX?uem foram os criadores do sistema operacional UNIX?",
+                "answer": "Dennis Ritchie e Ken Thompson",
+                "image": "",
+                "value": 100
+            },
+            {
+                "question": "Grace Hopper criou o primeiro compilador da história, qual é o nome desse compilador?",
+                "answer": "Assembly Language Version 0 (A-0)",
+                "image": "",
+                "value": 200
+            },
+            {
+                "question": "Em que ano foi criado o primeiro disco rígido?",
+                "answer": "1950",
+                "image": "",
+                "value": 300
+            },
+            {
+                "question": "Qual é considerada a primeira linguagem de programação criada?",
+                "answer": "Plankalkül (Plan Calculus)",
+                "image": "",
+                "value": 400
+            },
+            {
+                "question": "Diz os seguintes outputs para 5 == ‘5’ e 5 === ‘5’ em JavaScript?, ",
+                "answer": " concorrentemente.",
+                "image": "",
+                "value": 500
+            }
+        ],
+        "Segurança": [
+            {
+                "question": "Qual é o termo usado para descrever um ataque em que um invasor infiltra-se numa conversa entre dois sistemas e altera as mensagens que estão a ser trocadas?",
+                "answer": "Man-in-the-Middle (Homem no Meio)",
+                "image": "",
+                "value": 100
+            },
+            {
+                "question": "O que é um ransomware e o que ele faz?",
+                "answer": "Ransomware é um tipo de malware projetado para bloquear o acesso a arquivos ou sistemas de computador, geralmente por meio de criptografia",
+                "image": "",
+                "value": 200
+            },
+            {
+                "question": "Que nome se dá a um ataque que aproveita a falta de sanitização de inputs utilizados em interrogações a bases de dados SQL?",
+                "answer": "SQL Injection",
+                "image": "",
+                "value": 300
+            },
+            {
+                "question": "Qual é a técnica de criptografia que usa uma única chave para cifrar e decifrar informações, ao contrário da abordagem de chaves públicas e privadas?",
+                "answer": "Criptografia de Chave Simétrica",
+                "image": "",
+                "value": 400
+            },
+            {
+                "question": "Diz os seguintes outputs para 5 == ‘5’ e 5 === ‘5’ em JavaScript?, ",
+                "answer": " concorrentemente.",
+                "image": "",
+                "value": 500
+            }
+        ]
+    },
+    "tiebreaker": [
+        {
+            "question": "Quais são os três maiores rios do mundo em termos de volume de água?",
+            "answer": "Os três maiores rios do mundo em termos de volume de água são o Amazonas, o Nilo e o Yangtzé.",
+            "image": "",
+            "value": 0
+        },
+        {
+            "question": "Quais são os países que compartilham uma fronteira comum com o Brasil?",
+            "answer": "Os países que compartilham uma fronteira comum com o Brasil são Argentina, Bolívia, Colômbia, Paraguai, Peru, Uruguai, e Venezuela.",
+            "image": "",
+            "value": 0
+        },
+        {
+            "question": "Qual é a capital mais alta do mundo?",
+            "answer": "A capital mais alta do mundo é La Paz, localizada na Bolívia, a uma altitude de aproximadamente 3.650 metros.",
+            "image": "",
+            "value": 0
+        },
+        {
+            "question": "Quais são os quatro pontos cardeais?",
+            "answer": "Os quatro pontos cardeais são Norte, Sul, Leste e Oeste.",
+            "image": "",
+            "value": 0
+        },
+        {
+            "question": "Quais são os cinco oceanos do mundo?",
+            "answer": "Os cinco oceanos do mundo são o Oceano Atlântico, o Oceano Índico, o Oceano Pacífico, o Oceano Antártico e o Oceano Ártico.",
+            "image": "",
+            "value": 0
+        }
+    ]
+}

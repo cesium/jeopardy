@@ -2,12 +2,10 @@ import GameAnsweringQuestion from "./GameAnsweringQuestion";
 import GameSelectingQuestion from "./GameSelectingQuestion";
 import GameWaiting from "./GameWaiting";
 import GameOver from "./GameOver";
-
 import { State } from "../../types";
-
-import { useEffect, useState } from "react";
-
+import { useCallback, useEffect, useState } from "react";
 import useSound from "use-sound";
+import { processState } from "../../lib/utils";
 
 interface GameStateProps {
   state: State;
@@ -15,66 +13,75 @@ interface GameStateProps {
 }
 
 export default function GameState({ state, role }: GameStateProps) {
-  const [startAnimation, setStartAnimation] = useState<boolean>(false);
-  const [animationPosition, setAnimationPosition] = useState<number>(1);
-
+  const [startOpenAnimation, setStartOpenAnimation] = useState<boolean>(false);
+  const [startFadeOutAnimation, setStartFadeOutAnimation] =
+    useState<boolean>(false);
+  const [selectingQuestionInView, setSelectingQuestionInView] =
+    useState<boolean>(false);
+  const [animationPosition, setAnimationPosition] = useState<number>(0);
   const [selectingQuestion, setSelectingQuestion] = useState<boolean>(false);
   const [answeringQuestion, setAnsweringQuestion] = useState<boolean>(false);
+  const [answeringQuestionInView, setAnsweringQuestionInView] =
+    useState<boolean>(false);
   const [gameOver, setGameOver] = useState<boolean>(false);
-  const [waiting, setWaiting] = useState<boolean>(false);  
+  const [waiting, setWaiting] = useState<boolean>(false);
 
-  function getCellNr(): number {
+  // const [playThemeSong, { stop }] = useSound("/sounds/themesong.mp3", {
+  //   loop: true,
+  //   volume: 0.2,
+  // });
+
+  // useEffect(() => {
+  //   if (role === "viewer") {
+  //     playThemeSong();
+  //   }
+  // }, [playThemeSong, role]);
+
+  const getCellNr = useCallback(() => {
+    const [categories, points] = processState(state);
+
     const cq = state.currentQuestion;
-    const value = cq.value;
-    const categories: string[] = [
-      ...new Set(state.questions.map((q) => q.category)),
-    ];
     const column = categories.indexOf(cq.category);
-    let row = 0;
+    const row = points.indexOf(cq.value);
+    const columnsNr = categories.length;
 
-    switch (value) {
-      case 100:
-        row = 0;
-        break;
-      case 200:
-        row = 1;
-        break;
-      case 300:
-        row = 2;
-        break;
-      case 400:
-        row = 3;
-        break;
-      case 500:
-        row = 4;
-        break;
-      default:
-        break;
-    }
-
-    return row * 5 + column + 1;
-  }
+    return row * columnsNr + column;
+  }, [state]);
 
   useEffect(() => {
     switch (state.state) {
       case 1:
-        setSelectingQuestion(true);
-        setAnsweringQuestion(false);
-        setGameOver(false);
-        setWaiting(false);
+        setTimeout(() => {
+          setStartFadeOutAnimation(true);
+        }, 500);
+        setTimeout(() => {
+          setStartFadeOutAnimation(false);
+          setSelectingQuestion(true);
+          setAnsweringQuestion(false);
+          setAnsweringQuestionInView(false);
+          setGameOver(false);
+          setWaiting(false);
+        }, 1000);
+        setTimeout(() => {
+          setSelectingQuestionInView(true);
+        }, 1100);
         break;
       case 2:
         setAnimationPosition(getCellNr());
         setTimeout(() => {
-          setStartAnimation(true);
-        }, 1100);
+          setStartOpenAnimation(true);
+        }, 1000);
         setTimeout(() => {
-          setStartAnimation(false);
-          setSelectingQuestion(false);
+          setStartOpenAnimation(false);
           setAnsweringQuestion(true);
+          setSelectingQuestion(false);
+          setSelectingQuestionInView(false);
           setGameOver(false);
           setWaiting(false);
-        }, 2200);        
+        }, 2000);
+        setTimeout(() => {
+          setAnsweringQuestionInView(true);
+        }, 2100);
         break;
       case 3:
         break;
@@ -82,31 +89,43 @@ export default function GameState({ state, role }: GameStateProps) {
         break;
       case 5:
         setSelectingQuestion(false);
+        setSelectingQuestionInView(false);
         setAnsweringQuestion(false);
+        setAnsweringQuestionInView(false);
         setGameOver(true);
         setWaiting(false);
         break;
       case 0:
       default:
         setSelectingQuestion(false);
+        setSelectingQuestionInView(false);
         setAnsweringQuestion(false);
+        setAnsweringQuestionInView(false);
         setGameOver(false);
         setWaiting(true);
         break;
-    }    
-  }, [state]);
+    }
+  }, [state, getCellNr]);
 
   return (
     <>
       {selectingQuestion && (
         <GameSelectingQuestion
           state={state}
-          startAnimation={startAnimation}
+          startOpenAnimation={startOpenAnimation}
+          inView={selectingQuestionInView}
           animationPosition={animationPosition}
           role={role}
         />
       )}
-      {answeringQuestion && <GameAnsweringQuestion state={state} role={role} />}
+      {answeringQuestion && (
+        <GameAnsweringQuestion
+          state={state}
+          role={role}
+          fadeOut={startFadeOutAnimation}
+          inView={answeringQuestionInView}
+        />
+      )}
       {gameOver && <GameOver state={state} role={role} />}
       {waiting && <GameWaiting state={state} role={role} />}
     </>

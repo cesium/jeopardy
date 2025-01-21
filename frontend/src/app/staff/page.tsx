@@ -8,12 +8,6 @@ import { State } from "../../types.js";
 import GameState from "../../components/GameState";
 
 const Staff = () => {
-  const [playStart] = useSound("/sounds/start.mp3", { interrupt: true });
-
-  //In order to play sound, the user must interact with the page. We force this
-  // by making the user click a button before showing the game state
-  const [interacted, setInteracted] = useState<boolean>(false);
-
   const [state, setState] = useState<State>(null);
 
   useEffect(() => {
@@ -22,23 +16,10 @@ const Staff = () => {
     socket.addEventListener("message", (event) => {
       const newState: State = JSON.parse(event.data);
       setState(newState);
-      console.log("state updated:", newState);
     });
   }, []);
 
-  return (
-    <>
-      {!interacted && (
-        <button
-          className="text-white bg-accent m-auto block mt-12 py-2 px-4 text-3xl font-extrabold"
-          onClick={(_) => setInteracted(true)}
-        >
-          STAFF
-        </button>
-      )}
-      {interacted && state != null && <GameState state={state} role="staff" />}
-    </>
-  );
+  return state != null && <GameState state={state} role="staff" />;
 };
 
 export default Staff;
