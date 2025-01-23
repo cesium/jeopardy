@@ -334,6 +334,7 @@ class GameState:
         self.state: States = States.STARTING
         self.play_correct_sound: bool = False
         self.play_wrong_sound: bool = False
+        self.play_start_accepting: bool = False
 
         self.controllers_used_in_current_question = []
 
@@ -400,11 +401,11 @@ class GameState:
         """
         logging.debug("Set %d as team playing", team_idx)
         self.reading = False
-        if isinstance(self.controllers, Buzz):
-            self.controllers.turn_light_off(list({0, 1, 2, 3} - {team_idx}))
+        self.controllers.turn_light_off(list({0, 1, 2, 3} - {team_idx}))
 
         self.controllers_used_in_current_question.append(team_idx)
         self.teams_controller.set_current_playing(team_idx)
+        self.state = States.TEAM_SELECTED
 
     def split_or_steal(self, controller: int, option: bool):
         """split or steal the balance of the team
@@ -500,11 +501,10 @@ class GameState:
 
     def __set_reading(self, value: bool):
         self.reading = value
-        if isinstance(self.controllers, Buzz):
-            if value:
-                self.controllers.turn_light_on(self.get_teams_allowed_to_play())
-            else:
-                self.controllers.turn_light_off([0, 1, 2, 3])
+        if value:
+            self.controllers.turn_light_on(self.get_teams_allowed_to_play())
+        else:
+            self.controllers.turn_light_off([0, 1, 2, 3])
 
     def set_answering(self):
         """set the state as someone answering"""
@@ -512,6 +512,7 @@ class GameState:
         if self.state != States.SPLIT_OR_STEAL:
             self.state = States.ANSWERING_QUESTION
             self.reading_until = time.time_ns() + TIME_TO_ANSWER
+        self.play_start_accepting = True
         self.__set_reading(True)
 
     def answer_question(self, correct: bool):
@@ -571,6 +572,7 @@ class GameState:
             "alreadyAnswered": self.controllers_used_in_current_question,
             "playCorrectSound": self.play_correct_sound,
             "playWrongSound": self.play_wrong_sound,
+            "playStartAccepting": self.play_start_accepting,
         }
 
     def team_allowed_to_play(self, team_id: int) -> bool:
@@ -627,6 +629,7 @@ class GameState:
         """
         self.play_correct_sound = False
         self.play_wrong_sound = False
+        self.play_start_accepting = False
 
     def get_question(self, idx: int) -> Question:
         """set a question by id

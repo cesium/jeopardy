@@ -290,6 +290,7 @@ async def send_to_clients(message: str | dict):
                 await client.send_text(message)
             elif isinstance(message, dict):
                 await client.send_json(message)
+    shared_globals.state.reset_sound()
 
 
 @app.websocket("/ws")
