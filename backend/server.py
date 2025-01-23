@@ -4,7 +4,7 @@
 from asyncio import Lock
 from typing import List
 import logging
-from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
@@ -61,17 +61,17 @@ async def catch_multiple_exceptions(_: Request, exc: Exception) -> JSONResponse:
             content={"detail": str(exc)},
         )
     # Handle other exceptions (optional)
-    logging.error(exc_info=str(exc))
+    logging.error(str(exc))
     return JSONResponse(
         status_code=500,
         content={"detail": "An unexpected error occurred."},
     )
 
 
-class Player(BaseModel):
-    """JSON representation of a player"""
+class Team(BaseModel):
+    """JSON representation of a team"""
 
-    name: str
+    names: List[str]
     balance: int
 
 
@@ -90,9 +90,9 @@ class Question(BaseModel):
 class State(BaseModel):
     """JSON representation of answering a question"""
 
-    currentPlayer: Player
+    currentTeam: Team
     state: int
-    players: List[Player]
+    teams: List[Team]
 
 
 class Answer(BaseModel):
@@ -119,16 +119,17 @@ class SetQuestion(BaseModel):
     id: int
 
 
-class SetPlayers(BaseModel):
-    """JSON representation of setting name of the players"""
+class SetTeams(BaseModel):
+    """JSON representation of setting name of the teams"""
 
-    players: List[str]
+    teams: List[List[str]]
 
 
 class Buzz(BaseModel):
     """JSON representation of someone pressing the Buzz"""
 
-    player: int
+    controller: int
+    color: str
 
 
 @app.get("/state", response_model=State)
@@ -139,13 +140,13 @@ def get_state() -> dict:
         dict: JSON response
     """
     return {
-        "currentPlayer": shared_globals.state.get_current_player(),
+        "currentTeam": shared_globals.state.get_current_team(),
         "state": shared_globals.state.state,
-        "players": [None for p in shared_globals.state.list_players()],
+        "teams": [p.to_dict() for p in shared_globals.state.list_teams()],
     }
 
 
-@app.get("/questions", response_class=List[Question])
+@app.get("/questions", response_model=list[list[Question]])
 def get_questions() -> list:
     """list all questions
 
@@ -154,29 +155,32 @@ def get_questions() -> list:
     """
     questions = shared_globals.state.list_questions()
     categories = list({q.category for q in questions})
-    return [[q for q in questions if q.category == c] for c in categories]
+    return [[q.to_dict() for q in questions if q.category == c] for c in categories]
 
 
-@app.get("/winners", response_class=List[Player])
+@app.get("/winners", response_model=list[Team])
 def get_winners() -> list:
     """list the game winners
 
     Returns:
         list: JSON response
     """
-    return sorted(
-        shared_globals.state.list_players(), key=lambda p: p.balance, reverse=True
-    )
+    return [
+        t.to_dict()
+        for t in sorted(
+            shared_globals.state.list_teams(), key=lambda p: p.balance, reverse=True
+        )
+    ]
 
 
-@app.get("/players", response_class=List[Player])
-def get_players() -> list:
-    """list players
+@app.get("/teams", response_model=list[Team])
+def get_teams() -> list:
+    """list teams
 
     Returns:
         list: JSON response
     """
-    return [p.to_dict() for p in shared_globals.state.list_players()]
+    return [p.to_dict() for p in shared_globals.state.list_teams()]
 
 
 @app.get("/question/{idx}", response_model=Question)
@@ -189,7 +193,11 @@ def get_question(idx: int) -> dict:
     Returns:
         dict: JSON response
     """
-    return shared_globals.state.get_question(idx).to_dict()
+    print(idx)
+    q = shared_globals.state.get_question(idx)
+    if q is None:
+        raise HTTPException(status_code=404, detail="Question not found")
+    return q.to_dict()
 
 
 @app.post("/answer", response_model=AnswerResponse)
@@ -222,7 +230,7 @@ def post_set_question(body: SetQuestion) -> dict:
     """select a question
 
     Args:
-        body (SetPlayers): id of the question selected
+        body (SetTeams): id of the question selected
 
     Returns:
         dict: JSON response
@@ -231,17 +239,17 @@ def post_set_question(body: SetQuestion) -> dict:
     return {"status": "success"}
 
 
-@app.post("/players", response_model=BasicResponse)
-def post_players(body: SetPlayers) -> dict:
-    """set the name of the players
+@app.post("/teams", response_model=BasicResponse)
+def post_teams(body: SetTeams) -> dict:
+    """set the name of the teams
 
     Args:
-        body (SetPlayers): the name of the players
+        body (SetTeams): the name of the teams
 
     Returns:
         dict: JSON response
     """
-    shared_globals.state.set_players(body.players)
+    shared_globals.state.set_teams(body.teams)
     return {"status": "success"}
 
 
@@ -255,7 +263,7 @@ def post_buzz(body: Buzz) -> dict:
     Returns:
         dict: JSON response
     """
-    shared_globals.state.set_current_player(body.player)
+    shared_globals.state.buzz(body.controller, body.color)
     return {"status": "success"}
 
 
@@ -267,8 +275,6 @@ def post_buzz_start() -> dict:
         dict: JSON response
     """
     shared_globals.state.set_answering()
-    with shared_globals.buzz_condition:
-        shared_globals.buzz_condition.notify_all()
     return {"status": "success"}
 
 

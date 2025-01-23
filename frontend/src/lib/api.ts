@@ -33,8 +33,8 @@ export async function skipQuestion() {
   return response.data;
 }
 
-export async function getPlayers() {
-  const response = await API.get("/players");
+export async function getTeams() {
+  const response = await API.get("/teams");
 
   return response.data;
 }
@@ -53,9 +53,9 @@ export async function setQuestion(id: number) {
   return response.data;
 }
 
-export async function setPlayers(players: string[]) {
-  const response = await API.post("/players", {
-    players: players,
+export async function setTeams(teams: string[][]) {
+  const response = await API.post("/teams", {
+    teams: teams,
   });
 
   return response.data;

@@ -59,7 +59,8 @@ function GameWaitingStaff({ state }: GameWaitingProps) {
   };
 
   const submit = () => {
-    api.setPlayers(names);
+    //TODO: Actual use a list of names
+    api.setTeams(names.map((n) => n.split(";")));
   };
 
   return (

@@ -130,9 +130,9 @@ export default function GameSelectingQuestion({
         ))}
       </div>
       <div className="flex items-center justify-center h-full">
-        {state.players.map((p, idx) => (
-          <div key={`player-${idx}`} className="mx-12 uppercase">
-            <p className="font-bold text-4xl">{p.name}</p>
+        {state.teams.map((p, idx) => (
+          <div key={`team-${idx}`} className="mx-12 uppercase">
+            <p className="font-bold text-4xl">{p.names}</p>
             <p className="font-medium text-3xl mt-2">{p.balance}</p>
           </div>
         ))}

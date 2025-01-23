@@ -30,14 +30,14 @@ export default function GameOver({ state, role }: GameOverProps) {
           </h1>
         </div>
         <ol className="list-decimal uppercase text-xl">
-          {state?.players
+          {state?.teams
             ?.sort((a, b) => b.balance - a.balance)
             .map((p, idx) => (
               <li
                 key={idx}
                 className={`${idx == 0 && "text-8xl"} ${idx == 1 && "text-7xl"} ${idx == 2 && "text-6xl"} text-5xl my-2 flex place-content-between space-x-32`}
               >
-                <b>{p.name}</b>
+                <b>{p.names}</b>
                 <span>{p.balance} tokens</span>
               </li>
             ))}

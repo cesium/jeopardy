@@ -1,9 +1,19 @@
+# pylint: disable=too-many-instance-attributes
 """Module responsable for storing the state of the game"""
 
 from enum import Enum
 from typing import List
 import json
-from models import Player, Question
+import os
+import time
+import logging
+from models import Team, Question
+from buzz import Buzz
+
+
+SPLIT_OR_STEAL = bool(os.getenv("USE_SPLIT_OR_STEAL", "True"))
+BUZZ_PENALTY_TIMEOUT = int(os.getenv("BUZZ_PENALTY_TIMEOUT", "5")) * 1e9
+TIME_TO_ANSWER = int(os.getenv("TIME_TO_ANSWER", "20")) * 1e9
 
 
 class States(Enum):
@@ -13,8 +23,9 @@ class States(Enum):
     SELECTING_QUESTION = 1
     READING_QUESTION = 2
     ANSWERING_QUESTION = 3
-    PLAYER_SELECTED = 4
-    OVER = 5
+    TEAM_SELECTED = 4
+    SPLIT_OR_STEAL = 5
+    OVER = 6
 
 
 class QuestionsController:
@@ -124,41 +135,33 @@ class QuestionsController:
         else:
             self.current_question_idx += 1
 
-    def __answer_correctly(self, player: Player):
-        """action for a player answering a question correctly
+    def __answer_correctly(self, team: Team):
+        """action for a team answering a question correctly
 
         Args:
-            player (Player): player that answered the question
+            team (Team): team that answered the question
         """
-        self.questions[self.current_question_idx].answer_correctly(player)
+        self.questions[self.current_question_idx].answer_correctly(team)
 
-    def __answer_incorreclty(self, player: Player):
-        """action for a player answering a question incorrectly
+    def __answer_incorreclty(self, team: Team):
+        """action for a team answering a question incorrectly
 
         Args:
-            player (Player): player that answered the question
+            team (Team): team that answered the question
         """
-        self.questions[self.current_question_idx].answer_incorreclty(player)
+        self.questions[self.current_question_idx].answer_incorreclty(team)
 
-    def everyone_answered_current(self) -> bool:
-        """check if everyone already answered the current question
-
-        Returns:
-            bool: everyone already answered the current question
-        """
-        return self.questions[self.current_question_idx].everyone_answered()
-
-    def answer(self, player: Player, correct: bool):
+    def answer(self, team: Team, correct: bool):
         """action for answering a question
 
         Args:
-            player (Player): player that answered
+            team (Team): team that answered
             correct (bool): the answer is correct
         """
         if correct:
-            self.__answer_correctly(player)
+            self.__answer_correctly(team)
         else:
-            self.__answer_incorreclty(player)
+            self.__answer_incorreclty(team)
 
     def list_questions(self) -> List[Question]:
         """lists all question in the game
@@ -168,26 +171,7 @@ class QuestionsController:
         """
         return self.questions.copy()
 
-    def get_players_answered(self) -> List[Player]:
-        """list all players that answered the question
-
-        Returns:
-            List[Question]: list of players that answered the current question
-        """
-        return self.questions[self.current_question_idx].players_answered.copy()
-
-    def player_answered(self, player: Player) -> bool:
-        """check if player answered question
-
-        Args:
-            player (Player): player to check if answered
-
-        Returns:
-            bool: player already answered
-        """
-        return player in self.questions[self.current_question_idx].players_answered
-
-    def get_question(self, idx: int):
+    def get_question(self, idx: int) -> Question:
         """gets a question by id
 
         Args:
@@ -197,126 +181,169 @@ class QuestionsController:
             ValueError: idx is none
             ValueError: idx is invalid
         """
-        if idx is None:
-            raise ValueError("Invalid")
-        if self.in_tiebreak:
-            self.current_question_idx += 1
-        else:
-            if idx < 0 or idx >= len(self.questions):
-                raise ValueError("Index out of bonds")
-            self.current_question_idx = idx
+        if idx is None or idx < 0 or idx >= len(self.questions):
+            return None
+        return self.questions[idx]
 
 
-class PlayersController:
-    """Class for controling players atributes withtin the game"""
+class TeamsController:
+    """Class for controling teams atributes withtin the game"""
 
     def __init__(self):
-        self.players: List[Player] = []
-        self.current_playing_idx: int = 0
-        self.selecting_idx: int = 0
+        self.teams: List[Team] = []
+        self.current_playing_id: int = 0
+        self.selecting_id: int = 0
         self.playing: List[int] = []
 
-    def get_current_player(self) -> Player:
-        """get the player playing
+    def get_current_team(self) -> Team:
+        """get the team playing
 
         Returns:
-            Player: the player playing
+            Team: the team playing
         """
-        if self.players == []:
+        if self.teams == []:
             return None
-        return self.players[self.current_playing_idx]
+        return self.teams[self.current_playing_id]
 
-    def get_player(self, idx: int) -> Player:
-        """get player with given id
+    def get_team(self, idx: int) -> Team:
+        """get team with given id
 
         Args:
-            idx (int): id of player
+            idx (int): id of team
 
         Returns:
-            Player: player with given id
+            Team: team with given id
         """
-        if self.players == []:
+        if self.teams == []:
             return None
-        return self.players[idx]
+        return self.teams[idx]
 
-    def get_selecting_player(self) -> Player:
-        """get the player selecting
+    def get_selecting_team(self) -> Team:
+        """get the team selecting
 
         Returns:
-            Player: the player selecting
+            Team: the team selecting
         """
-        if self.players == []:
+        if self.teams == []:
             return None
-        return self.players[self.selecting_idx]
+        return self.teams[self.selecting_id]
 
-    def set_players(self, players_names: List[str]):
-        """creates the players with the given names
+    def set_teams(self, player_teams_names: List[List[str]]):
+        """creates the teams with the given names
 
         Args:
-            players_names (List[str]): list of names
+            teams_names (List[str]): list of names
+        Raises:
+            ValueError: Too many teams (max 4)
+            ValueError: Too many players in a team (max 4)
         """
-        self.players = [Player(idx, name) for idx, name in enumerate(players_names)]
-        self.current_playing_idx = 0
-        self.selecting_idx = 0
-        self.playing = list(range(4))
+        if len(player_teams_names) > 4:
+            raise ValueError("Too many teams (max 4)")
+        for t in player_teams_names:
+            if len(t) > 4:
+                raise ValueError("Too many players in a team (max 4)")
+        self.teams = [Team(idx, names) for idx, names in enumerate(player_teams_names)]
+        self.current_playing_id = 0
+        self.selecting_id = 0
+        self.playing = list(range(len(player_teams_names)))
+
+    def split_or_steal(self, votes: List[int]):
+        """split or steal the balance of the team
+
+        Args:
+            members (List[int]): list of members that stole.
+        """
+        logging.debug("Split or Steal: [%s]", ",".join(str(v) for v in votes))
+        team = self.get_winning_team()
+        if len(votes) > 1:
+            team.balance = 0
+        elif len(votes) == 1:
+            stealer = votes[0]
+            new_id = len(self.teams)
+            self.teams.append(Team(new_id, [team.names[stealer]]))
+            self.teams[new_id].balance = team.balance
+            team.balance = 0
+            del team.names[stealer]
 
     def set_selecting(self, idx: int):
-        """set player with given id as selecting
+        """set team with given id as selecting
 
         Args:
-            idx (int): id of player to set as selecting
+            idx (int): id of team to set as selecting
         """
-        self.selecting_idx = idx
+        self.selecting_id = idx
 
     def set_current_playing(self, idx: int):
-        """set player with given id as playing
+        """set team with given id as playing
 
         Args:
-            idx (int): id of player to set as playing
+            idx (int): id of team to set as playing
         """
-        self.current_playing_idx = idx
+        self.current_playing_id = idx
 
     def is_tie(self) -> bool:
-        """check if the players are in a tie
+        """check if the teams are in a tie
 
         Returns:
-            bool: the players are in a tie
+            bool: the teams are in a tie
         """
-        max_tokens = max(p.balance for p in self.players)
-        players_with_max_tokens = [
-            p.id for p in self.players if p.balance == max_tokens
-        ]
-        if len(players_with_max_tokens) > 1:
-            self.playing = players_with_max_tokens
+        max_tokens = max(p.balance for p in self.teams)
+        teams_with_max_tokens = [p.id for p in self.teams if p.balance == max_tokens]
+        if len(teams_with_max_tokens) > 1:
+            self.playing = teams_with_max_tokens
             return True
         return False
 
-    def next_selecting(self):
-        """make the next player in line be the selecting one"""
-        self.selecting_idx = (self.selecting_idx + 1) % 4
-
-    def set_selecting_as_current(self):
-        """make the player playing as the selecting"""
-        self.selecting_idx = self.current_playing_idx
-
-    def list_players(self) -> List[Player]:
-        """return the list of the players in the game
+    def get_winning_team(self) -> Team:
+        """get the winning team
 
         Returns:
-            List[Player]: list of players in the game
+            Team: the winning team
         """
-        return self.players.copy()
+        if self.teams == []:
+            return None
+        c = self.teams[0]
+        for t in self.teams[1:]:
+            if t.balance > c.balance:
+                c = t
+        return c
+
+    def next_selecting(self):
+        """make the next team in line be the selecting one"""
+        self.selecting_id = (self.selecting_id + 1) % 4
+
+    def set_selecting_as_current(self):
+        """make the team playing as the selecting"""
+        self.selecting_id = self.current_playing_id
+
+    def list_teams(self) -> List[Team]:
+        """return the list of the teams in the game
+
+        Returns:
+            List[Team]: list of teams in the game
+        """
+        return self.teams.copy()
 
 
 class GameState:
     """Class to store the state of the game"""
 
-    def __init__(self):
+    def __init__(self, controllers: Buzz):
         self.questions_controller = QuestionsController()
-        self.players_controller = PlayersController()
+        self.teams_controller = TeamsController()
         self.state: States = States.STARTING
         self.play_correct_sound: bool = False
         self.play_wrong_sound: bool = False
+
+        self.controllers_used_in_current_question = []
+
+        self.sos_steal = {}
+
+        self.controllers = controllers
+        self.reading = False
+        self.__set_reading(False)
+        self.reading_until = time.time_ns()
+        self.timeouts = [time.time_ns()] * 4
 
     def get_current_question(self) -> Question:
         """return the question being used at the moment
@@ -326,52 +353,115 @@ class GameState:
         """
         return self.questions_controller.get_current_question()
 
-    def get_current_player(self) -> Player:
-        """return the player playing
+    def get_current_team(self) -> Team:
+        """return the team playing
 
         Returns:
-            Player: the player playing
+            Team: the team playing
         """
-        return self.players_controller.get_current_player()
+        return self.teams_controller.get_current_team()
 
-    def get_players_answered_current_question(self) -> List[Player]:
-        """return the players that answered the current question
+    def get_controllers_answered_current_question(self) -> List[int]:
+        """return the controllers that answered the current question
 
         Returns:
-            List[Player]: list of players that answered the current question
+            List[int]: list of controllers that answered the current question
         """
-        return self.questions_controller.get_players_answered()
+        return self.controllers_used_in_current_question
 
-    def get_allowed_players(self) -> List[int]:
-        """return the players that are allowed to play
+    def get_allowed_controllers(self) -> List[int]:
+        """return the controllers that are allowed to play
 
         Returns:
-            List[int]: list of players that are allowed to play
+            List[int]: list of controllers that are allowed to play
         """
-        return self.players_controller.playing
+        return self.teams_controller.playing
 
-    def set_players(self, players_names: List[str]):
-        """sets the players playing
+    def set_teams(self, teams_names: List[str]):
+        """sets the teams playing
 
         Args:
-            players_names (List[str]): list of the names of the players
+            teams_names (List[str]): list of the names of the teams
 
         Raises:
-            AssertionError: if players are set mid game
+            AssertionError: if teams are set mid game
         """
+        logging.debug("Setting Teams")
         if self.state != States.STARTING:
-            raise AssertionError("Cannot set players mid game")
-        self.players_controller.set_players(players_names)
+            raise AssertionError("Cannot set teams mid game")
+        self.teams_controller.set_teams(teams_names)
         self.state = States.SELECTING_QUESTION
 
-    def set_current_player(self, player_idx: int):
-        """set a new player as playing
+    def set_current_team(self, team_idx: int):
+        """set a new team as playing
 
         Args:
-            player_idx (int): the id of the player
+            team_idx (int): the id of the team
         """
-        self.players_controller.set_current_playing(player_idx)
-        self.state = States.PLAYER_SELECTED
+        logging.debug("Set %d as team playing", team_idx)
+        self.reading = False
+        if isinstance(self.controllers, Buzz):
+            self.controllers.turn_light_off(list({0, 1, 2, 3} - {team_idx}))
+
+        self.controllers_used_in_current_question.append(team_idx)
+        self.teams_controller.set_current_playing(team_idx)
+
+    def split_or_steal(self, controller: int, option: bool):
+        """split or steal the balance of the team
+
+        Args:
+            controller (int): controller that is splitting or stealing
+            option (bool): the option the controller chose
+        """
+        logging.debug("Split or Steal: %d %s", controller, option)
+        self.controllers_used_in_current_question.append(controller)
+        self.sos_steal[controller] = option
+        print(self.sos_steal)
+        print(self.teams_controller.playing)
+        if len(self.sos_steal) == len(self.teams_controller.playing):
+            stealers = [i for i, k in self.sos_steal.items() if k]
+            self.teams_controller.split_or_steal(stealers)
+            self.state = States.OVER
+
+    def __handle_normal_buzz(self, controller: int, color: str):
+        if color == "red":
+            if self.reading:
+                if self.reading_until >= time.time_ns():
+                    if self.timeouts[controller] >= time.time_ns():
+                        logging.info("TIMEOUT")
+                    else:
+                        self.set_current_team(controller)
+            else:
+                logging.info("NOT READING")
+                self.timeouts[controller] = time.time_ns() + BUZZ_PENALTY_TIMEOUT
+
+    def __handle_sos_buzz(self, controller: int, color: str):
+        if self.reading:
+            if color in {"green", "orange"}:
+                self.controllers_used_in_current_question.append(controller)
+            if color == "green":
+                logging.info("SOS SPLIT")
+                self.split_or_steal(controller, False)
+            elif color == "orange":
+                logging.info("SOS STEAL")
+                self.split_or_steal(controller, True)
+        else:
+            logging.info("NOT READING")
+
+    def buzz(self, controller: int, color: str):
+        """action for a team buzzing
+
+        Args:
+            controller (int): the id of the controller
+            color (str): color pressed
+        """
+        logging.info("BUZZ: %d %s", controller, color)
+
+        if self.team_allowed_to_play(controller):
+            if self.state == States.SPLIT_OR_STEAL:
+                self.__handle_sos_buzz(controller, color)
+            else:
+                self.__handle_normal_buzz(controller, color)
 
     def select_question(self, identifier: int):
         """select a new question
@@ -379,62 +469,86 @@ class GameState:
         Args:
             identifier (int): id of the question to select
         """
-        print(identifier)
+        logging.debug("SELECT QUESTION: %d", identifier)
         self.questions_controller.select_question(identifier)
         self.state = States.READING_QUESTION
 
     def skip_question(self):
         """skip the current question"""
+        logging.debug("SKIP QUESTION")
+
         self.questions_controller.skip()
-        self.players_controller.set_current_playing(0)
+        self.controllers_used_in_current_question = []
+        self.teams_controller.set_current_playing(0)
 
         if self.questions_controller.questions_over():
-            if self.players_controller.is_tie():
+            if self.teams_controller.is_tie():
                 self.questions_controller.tiebreak()
                 self.state = States.READING_QUESTION
             else:
-                self.state = States.OVER
+                self.__end_game()
         else:
             self.state = States.SELECTING_QUESTION
 
+    def __end_game(self):
+        t = self.teams_controller.get_winning_team()
+        if len(t.names) > 1 and SPLIT_OR_STEAL:
+            self.teams_controller.playing = list(range(len(t.names)))
+            self.state = States.SPLIT_OR_STEAL
+        else:
+            self.state = States.OVER
+
+    def __set_reading(self, value: bool):
+        self.reading = value
+        if isinstance(self.controllers, Buzz):
+            if value:
+                self.controllers.turn_light_on(self.get_teams_allowed_to_play())
+            else:
+                self.controllers.turn_light_off([0, 1, 2, 3])
+
     def set_answering(self):
         """set the state as someone answering"""
-        self.state = States.ANSWERING_QUESTION
+        logging.debug("Waiting for answer")
+        if self.state != States.SPLIT_OR_STEAL:
+            self.state = States.ANSWERING_QUESTION
+            self.reading_until = time.time_ns() + TIME_TO_ANSWER
+        self.__set_reading(True)
 
     def answer_question(self, correct: bool):
-        """action for player answering question
+        """action for team answering question
 
         Args:
             correct (bool): the answer is correct
         """
+        logging.debug("Question answered %s", correct)
         self.reset_sound()
 
-        self.questions_controller.answer(self.get_current_player(), correct)
+        self.questions_controller.answer(self.get_current_team(), correct)
 
         if correct:
             self.play_correct_sound = True
-            self.players_controller.set_selecting_as_current()
+            self.teams_controller.set_selecting_as_current()
         else:
             self.play_wrong_sound = True
 
             if (
-                self.questions_controller.everyone_answered_current()
-            ):  # if all players answered incorrectly
-                self.players_controller.next_selecting()
+                len(self.controllers_used_in_current_question) == 4
+            ):  # if all teams answered incorrectly
+                self.teams_controller.next_selecting()
 
-        # self.players_controller.set_current_playing(0)
-
-        if not correct and not self.questions_controller.everyone_answered_current():
+        if not correct and len(self.controllers_used_in_current_question) != 4:
             self.state = States.READING_QUESTION
         else:
             self.state = States.SELECTING_QUESTION
+            self.controllers_used_in_current_question = []
 
         if self.questions_controller.questions_over():
-            if self.players_controller.is_tie():
-                self.state = States.READING_QUESTION
+            if self.teams_controller.is_tie():
                 self.questions_controller.tiebreak()
+                self.state = States.READING_QUESTION
             else:
-                self.state = States.OVER
+                self.__end_game()
+        self.__set_reading(False)
 
     def to_dict(self) -> dict:
         """
@@ -442,40 +556,66 @@ class GameState:
         Returns:
             dict: the gamestate data
         """
-        selecting_player = self.players_controller.get_selecting_player()
-        current_player = self.players_controller.get_current_player()
+        selecting_team = self.teams_controller.get_selecting_team()
+        current_team = self.teams_controller.get_current_team()
 
         return {
-            "players": [p.to_dict() for p in self.list_players()],
+            "teams": [p.to_dict() for p in self.list_teams()],
             "questions": [q.to_dict() for q in self.list_questions()],
             "state": self.state.value,
             "currentQuestion": self.get_current_question().to_dict(),
-            "currentPlayer": current_player.id if current_player is not None else None,
-            "selectingPlayer": (
-                selecting_player.id if selecting_player is not None else None
+            "currentTeam": current_team.id if current_team is not None else None,
+            "selectingTeam": (
+                selecting_team.id if selecting_team is not None else None
             ),
-            "alreadyAnswered": [
-                p.id
-                for p in self.questions_controller.get_current_question().players_answered
-            ],
+            "alreadyAnswered": self.controllers_used_in_current_question,
             "playCorrectSound": self.play_correct_sound,
             "playWrongSound": self.play_wrong_sound,
         }
 
-    def player_allowed_to_play(self, player_id: int) -> bool:
-        """check if player is allowed to play"""
-        return player_id in self.get_allowed_players()
+    def team_allowed_to_play(self, team_id: int) -> bool:
+        """check if a team is allowed to play
 
-    def player_already_answered(self, player_id: int) -> bool:
-        """check if player already answered"""
+        Args:
+            team_id (int): id of the team to check
+
+        Returns:
+            bool: if the team can play
+        """
         return (
-            self.players_controller.get_player(player_id)
-            in self.get_players_answered_current_question()
+            not self.team_already_answered(team_id)
+            and team_id in self.get_allowed_controllers()
         )
 
-    def list_players(self) -> List[Player]:
-        """return the list of players"""
-        return self.players_controller.list_players()
+    def get_teams_allowed_to_play(self) -> List[int]:
+        """list teams allowed to play
+
+        Returns:
+            List[int]: teams allowed to play
+        """
+        return list(
+            set(self.get_allowed_controllers())
+            - set(self.controllers_used_in_current_question)
+        )
+
+    def team_already_answered(self, team_id: int) -> bool:
+        """check if team already answered
+
+        Args:
+            team_id (int): the id of the team to check if already answered
+
+        Returns:
+            bool: if the team already answered
+        """
+        return team_id in self.controllers_used_in_current_question
+
+    def list_teams(self) -> List[Team]:
+        """return the list of teams
+
+        Returns:
+            List[Team]: the teams in the game
+        """
+        return self.teams_controller.list_teams()
 
     def list_questions(self) -> List[Question]:
         """return the list of questions"""
@@ -489,7 +629,7 @@ class GameState:
         self.play_wrong_sound = False
 
     def get_question(self, idx: int) -> Question:
-        """get a question by id
+        """set a question by id
 
         Args:
             idx (int): the index of the question

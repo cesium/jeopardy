@@ -2,20 +2,22 @@
 # pylint: disable=too-many-instance-attributes
 # pylint: disable=too-many-positional-arguments
 """Module of classes used in gamestate"""
+from typing import List
 
 
-class Player:
+class Team:
     """
-    Player class
+    Team class
     """
 
-    def __init__(self, idx: int, name: str):
+    def __init__(self, idx: int, names: List[str], controller: int = None):
         self.id: int = idx
-        self.name: str = name
+        self.names: List[str] = names
         self.balance: int = 0
+        self.controller: int = idx if controller is None else controller
 
     def add_points(self, points: int):
-        """add points to the player
+        """add points to the team
 
         Args:
             points (int): number of points to add
@@ -23,18 +25,18 @@ class Player:
         self.balance += points
 
     def to_dict(self) -> dict:
-        """represent the player as a dictionary
+        """represent the team as a dictionary
 
         Returns:
-            dict: the representation of the player
+            dict: the representation of the team
         """
-        return {"name": self.name, "balance": self.balance}
+        return {"names": self.names, "balance": self.balance}
 
     def __repr__(self) -> str:
         """
-            represent a player
+            represent a team
         Returns:
-            str: the player
+            str: the team
         """
         return f"{self.id}"
 
@@ -62,34 +64,23 @@ class Question:
         self.category: str = category
         self.answered: bool = False
         self.tie_breaker: bool = tie_breaker
-        self.players_answered: list[Player] = []
 
-    def answer_incorreclty(self, player: Player):
+    def answer_incorreclty(self, team: Team):
         """action for playing answering incorrectly
 
         Args:
-            player (Player): the player that answered
+            team (Team): the team that answered
         """
-        self.players_answered.append(player)
         if not self.tie_breaker:
-            player.add_points(-self.value)
+            team.add_points(-self.value)
 
-    def everyone_answered(self) -> bool:
-        """check if all players answered the question
-
-        Returns:
-            bool: all players answered the question
-        """
-        return len(self.players_answered) == 4
-
-    def answer_correctly(self, player: Player):
+    def answer_correctly(self, team: Team):
         """action for playing answering correctly
 
         Args:
-            player (Player): the player that answered
+            team (Team): the team that answered
         """
-        self.players_answered.append(player)
-        player.add_points(self.value)
+        team.add_points(self.value)
         self.answered = True
 
     def skip(self):

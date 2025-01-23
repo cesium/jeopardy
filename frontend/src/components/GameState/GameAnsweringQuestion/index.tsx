@@ -181,12 +181,12 @@ export default function GameAnsweringQuestion({
           </div>
         )}
         <div className="flex items-center justify-center my-24 text-center uppercase">
-          {state.players.map((p, idx) => (
+          {state.teams.map((p, idx) => (
             <div
-              key={`player-${idx}`}
-              className={`mx-12 ${state.state == 4 && state.currentPlayer.name == p.name ? "text-primary" : ""}`}
+              key={`team-${idx}`}
+              className={`mx-12 ${state.state == 4 && state.currentTeam.names == p.names ? "text-primary" : ""}`}
             >
-              <p className="font-extrabold text-4xl">{p.name}</p>
+              <p className="font-extrabold text-4xl">{p.names}</p>
               <p className="font-bold text-3xl mt-2">{p.balance}</p>
             </div>
           ))}

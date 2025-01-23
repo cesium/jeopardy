@@ -1,5 +1,5 @@
-export type Player = {
-  name: string;
+export type Team = {
+  names: string[];
   balance: number;
 };
 
@@ -14,12 +14,12 @@ export type Question = {
 };
 
 export type State = {
-  players: Player[];
+  teams: Team[];
   questions: Question[];
   state: number;
   currentQuestion: Question;
-  currentPlayer: Player;
-  selectingPlayer: number;
+  currentTeam: Team;
+  selectingTeam: number;
   alreadyAnswered: number[];
   playCorrectSound: boolean;
   playWrongSound: boolean;
