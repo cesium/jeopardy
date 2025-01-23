@@ -132,8 +132,8 @@ export default function GameSelectingQuestion({
       <div className="flex items-center justify-center h-full">
         {state.players.map((p, idx) => (
           <div key={`player-${idx}`} className="mx-12 uppercase">
-            <p className="font-bold text-4xl">{p.name}</p>
-            <p className="font-medium text-3xl mt-2">{p.balance}</p>
+            <p className={`font-bold text-4xl ${state.selectingPlayer === idx && "text-primary"}`}>{p.name}</p>
+            <p className={`font-medium text-3xl mt-2 ${state.selectingPlayer === idx && "text-primary"}`}>{p.balance}</p>
           </div>
         ))}
       </div>
