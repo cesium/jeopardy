@@ -335,6 +335,7 @@ class GameState:
         self.play_correct_sound: bool = False
         self.play_wrong_sound: bool = False
         self.play_start_accepting: bool = False
+        self.play_buzzer_sound: bool = False
 
         self.controllers_used_in_current_question = []
 
@@ -406,6 +407,7 @@ class GameState:
         self.controllers_used_in_current_question.append(team_idx)
         self.teams_controller.set_current_playing(team_idx)
         self.state = States.TEAM_SELECTED
+        self.play_buzzer_sound = True
 
     def split_or_steal(self, controller: int, option: bool):
         """split or steal the balance of the team
@@ -573,6 +575,7 @@ class GameState:
             "playCorrectSound": self.play_correct_sound,
             "playWrongSound": self.play_wrong_sound,
             "playStartAccepting": self.play_start_accepting,
+            "playBuzzerSound": self.play_buzzer_sound,
         }
 
     def team_allowed_to_play(self, team_id: int) -> bool:
@@ -630,6 +633,7 @@ class GameState:
         self.play_correct_sound = False
         self.play_wrong_sound = False
         self.play_start_accepting = False
+        self.play_buzzer_sound = False
 
     def get_question(self, idx: int) -> Question:
         """set a question by id
