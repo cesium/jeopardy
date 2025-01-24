@@ -278,6 +278,17 @@ def post_buzz_start() -> dict:
     return {"status": "success"}
 
 
+@app.post("/stop_timer", response_model=BasicResponse)
+def post_stop_timer() -> dict:
+    """stop accepting buzz inputs
+
+    Returns:
+        dict: JSON response
+    """
+    shared_globals.state.stop_countdown_timer()
+    return {"status": "success"}
+
+
 async def send_to_clients(message: str | dict):
     """Broadcast a message to every websocket connected
 

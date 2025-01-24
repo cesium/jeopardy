@@ -325,6 +325,44 @@ class TeamsController:
         return self.teams.copy()
 
 
+class Actions:
+    """Class for controling actions atributes withtin the game"""
+
+    def __init__(self):
+        self.play_correct_sound: bool = False
+        self.play_wrong_sound: bool = False
+        self.play_start_accepting: bool = False
+        self.play_buzzer_sound: bool = False
+        self.stop_countdown: bool = False
+
+    def reset_sound(self):
+        """
+        Set both sound playing to false
+        """
+        self.play_correct_sound = False
+        self.play_wrong_sound = False
+        self.play_start_accepting = False
+        self.play_buzzer_sound = False
+
+    def reset_countdown_timer(self):
+        """reset the countdown timer"""
+        self.stop_countdown = False
+
+    def to_dict(self) -> dict:
+        """
+            cast the state as a dictionary to represent as json object
+        Returns:
+            dict: the gamestate data
+        """
+        return {
+            "playCorrectSound": self.play_correct_sound,
+            "playWrongSound": self.play_wrong_sound,
+            "playStartAccepting": self.play_start_accepting,
+            "playBuzzerSound": self.play_buzzer_sound,
+            "stopTimer": self.stop_countdown,
+        }
+
+
 class GameState:
     """Class to store the state of the game"""
 
@@ -332,10 +370,7 @@ class GameState:
         self.questions_controller = QuestionsController()
         self.teams_controller = TeamsController()
         self.state: States = States.STARTING
-        self.play_correct_sound: bool = False
-        self.play_wrong_sound: bool = False
-        self.play_start_accepting: bool = False
-        self.play_buzzer_sound: bool = False
+        self.actions = Actions()
 
         self.controllers_used_in_current_question = []
 
@@ -346,14 +381,6 @@ class GameState:
         self.__set_reading(False)
         self.reading_until = time.time_ns()
         self.timeouts = [time.time_ns()] * 4
-
-    def get_current_question(self) -> Question:
-        """return the question being used at the moment
-
-        Returns:
-            Question: the question being used
-        """
-        return self.questions_controller.get_current_question()
 
     def get_current_team(self) -> Team:
         """return the team playing
@@ -407,9 +434,9 @@ class GameState:
         self.controllers_used_in_current_question.append(team_idx)
         self.teams_controller.set_current_playing(team_idx)
         self.state = States.TEAM_SELECTED
-        self.play_buzzer_sound = True
+        self.actions.play_buzzer_sound = True
 
-    def split_or_steal(self, controller: int, option: bool):
+    def __split_or_steal(self, controller: int, option: bool):
         """split or steal the balance of the team
 
         Args:
@@ -444,10 +471,10 @@ class GameState:
                 self.controllers_used_in_current_question.append(controller)
             if color == "green":
                 logging.info("SOS SPLIT")
-                self.split_or_steal(controller, False)
+                self.__split_or_steal(controller, False)
             elif color == "orange":
                 logging.info("SOS STEAL")
-                self.split_or_steal(controller, True)
+                self.__split_or_steal(controller, True)
         else:
             logging.info("NOT READING")
 
@@ -492,6 +519,8 @@ class GameState:
                 self.__end_game()
         else:
             self.state = States.SELECTING_QUESTION
+        self.__set_reading(False)
+        self.actions.reset_countdown_timer()
 
     def __end_game(self):
         t = self.teams_controller.get_winning_team()
@@ -514,7 +543,7 @@ class GameState:
         if self.state != States.SPLIT_OR_STEAL:
             self.state = States.ANSWERING_QUESTION
             self.reading_until = time.time_ns() + TIME_TO_ANSWER
-        self.play_start_accepting = True
+        self.actions.play_start_accepting = True
         self.__set_reading(True)
 
     def answer_question(self, correct: bool):
@@ -529,10 +558,10 @@ class GameState:
         self.questions_controller.answer(self.get_current_team(), correct)
 
         if correct:
-            self.play_correct_sound = True
+            self.actions.play_correct_sound = True
             self.teams_controller.set_selecting_as_current()
         else:
-            self.play_wrong_sound = True
+            self.actions.play_wrong_sound = True
 
             if (
                 len(self.controllers_used_in_current_question) == 4
@@ -552,6 +581,7 @@ class GameState:
             else:
                 self.__end_game()
         self.__set_reading(False)
+        self.actions.reset_countdown_timer()
 
     def to_dict(self) -> dict:
         """
@@ -566,16 +596,13 @@ class GameState:
             "teams": [p.to_dict() for p in self.list_teams()],
             "questions": [q.to_dict() for q in self.list_questions()],
             "state": self.state.value,
-            "currentQuestion": self.get_current_question().to_dict(),
+            "currentQuestion": self.questions_controller.get_current_question().to_dict(),
             "currentTeam": current_team.id if current_team is not None else None,
             "selectingTeam": (
                 selecting_team.id if selecting_team is not None else None
             ),
             "alreadyAnswered": self.controllers_used_in_current_question,
-            "playCorrectSound": self.play_correct_sound,
-            "playWrongSound": self.play_wrong_sound,
-            "playStartAccepting": self.play_start_accepting,
-            "playBuzzerSound": self.play_buzzer_sound,
+            "actions": self.actions.to_dict(),
         }
 
     def team_allowed_to_play(self, team_id: int) -> bool:
@@ -628,12 +655,13 @@ class GameState:
 
     def reset_sound(self):
         """
-        Set both sound playing to false
+        Set sounds playing to false
         """
-        self.play_correct_sound = False
-        self.play_wrong_sound = False
-        self.play_start_accepting = False
-        self.play_buzzer_sound = False
+        self.actions.reset_sound()
+
+    def stop_countdown_timer(self):
+        """stop the countdown timer"""
+        self.actions.stop_countdown = True
 
     def get_question(self, idx: int) -> Question:
         """set a question by id
