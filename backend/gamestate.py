@@ -8,7 +8,8 @@ import os
 import time
 import logging
 from models import Team, Question
-from buzz import Buzz
+from buzz_interface import Buzz
+from requests.exceptions import ConnectionError as requests_ConnectionError
 
 
 SPLIT_OR_STEAL = bool(os.getenv("USE_SPLIT_OR_STEAL", "True"))
@@ -532,10 +533,13 @@ class GameState:
 
     def __set_reading(self, value: bool):
         self.reading = value
-        if value:
-            self.controllers.turn_light_on(self.get_teams_allowed_to_play())
-        else:
-            self.controllers.turn_light_off([0, 1, 2, 3])
+        try:
+            if value:
+                self.controllers.turn_light_on(self.get_teams_allowed_to_play())
+            else:
+                self.controllers.turn_light_off([0, 1, 2, 3])
+        except requests_ConnectionError:
+            logging.error("Failed to connect to buzz controllers")
 
     def set_answering(self):
         """set the state as someone answering"""

@@ -333,6 +333,4 @@ def webserver_thread(host: str, port: int):
         host (str): host server will run on
         port (int): port server will run on
     """
-
-    print(f"Server running on {host}:{port}")
     uvicorn.run(app, host=host, port=port, ws="websockets")
