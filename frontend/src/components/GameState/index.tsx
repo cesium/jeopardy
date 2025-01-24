@@ -49,6 +49,7 @@ export default function GameState({ state, role }: GameStateProps) {
   }, [state]);
 
   useEffect(() => {
+    console.log(state);
     switch (state.state) {
       case 1:
         setTimeout(() => {

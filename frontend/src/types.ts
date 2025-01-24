@@ -23,4 +23,6 @@ export type State = {
   alreadyAnswered: number[];
   playCorrectSound: boolean;
   playWrongSound: boolean;
+  playStartAccepting: boolean;
+  playBuzzerSound: boolean;
 };

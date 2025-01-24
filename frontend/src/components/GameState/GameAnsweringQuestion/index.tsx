@@ -49,7 +49,7 @@ export default function GameAnsweringQuestion({
 }: GameAnsweringQuestionProps) {
   const [playTimerSound, { stop }] = useSound("/sounds/timer.mp3", {
     interrupt: true,
-    volume: 3,
+    volume: 4,
   });
   const [playBuzzSound] = useSound("/sounds/buzz.mp3", {
     interrupt: true,
@@ -70,18 +70,6 @@ export default function GameAnsweringQuestion({
   const [started, setStarted] = useState<boolean>(false);
 
   useEffect(() => {
-    if (role === "viewer" && state.state === 4) {
-      playBuzzSound();
-      setTimeout(() => playTimerSound(), 500);
-      setTimeout(() => stop(), 7000);
-    } else stop();
-  }, [state, playBuzzSound, role, playTimerSound, stop]);
-
-  useEffect(() => {
-    if (state && state.state === 3) playStart();
-  }, [state, playStart]);
-
-  useEffect(() => {
     if (role === "viewer") {
       if (state.playCorrectSound) {
         playCorrectSound();
@@ -89,8 +77,25 @@ export default function GameAnsweringQuestion({
       if (state.playWrongSound) {
         playWrongSound();
       }
+      if (state.playStartAccepting) {
+        playStart();
+      }
+      if (state.playBuzzerSound) {
+        playBuzzSound();
+        setTimeout(() => playTimerSound(), 500);
+        setTimeout(() => stop(), 7000);
+      }
     }
-  }, [state, playCorrectSound, playWrongSound, role]);
+  }, [
+    state,
+    playCorrectSound,
+    playWrongSound,
+    playStart,
+    playBuzzSound,
+    playTimerSound,
+    stop,
+    role,
+  ]);
 
   const startQuestion = () => {
     api.startQuestion().then((_) => setStarted(true));
