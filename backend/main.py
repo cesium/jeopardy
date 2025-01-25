@@ -4,10 +4,7 @@ import os
 import argparse
 import logging
 from dotenv import load_dotenv
-from server import webserver_thread
-from buzz_interface import Buzz
-import shared_globals
-from gamestate import GameState
+from server import start
 
 parser = argparse.ArgumentParser(description="Jeopardy Backend Controller")
 parser.add_argument("--debug", action="store_true", help="Enable debug mode.")
@@ -24,7 +21,4 @@ if __name__ == "__main__":
     else:
         logging.basicConfig(level=logging.INFO)
 
-    buzzController = Buzz("localhost", CONTROLLERS_PORT)
-    shared_globals.state = GameState(buzzController)
-
-    webserver_thread("0.0.0.0", SERVER_PORT)
+    start("0.0.0.0", SERVER_PORT, CONTROLLERS_PORT)

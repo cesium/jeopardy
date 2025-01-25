@@ -10,13 +10,15 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from starlette.middleware.base import BaseHTTPMiddleware
 import uvicorn
-import shared_globals
+from buzz_interface import Buzz
+from gamestate.gamestate import GameState
 
 # Initialize FastAPI app
 app = FastAPI()
 
 app.my_clients = set()
 app.my_clients_lock = Lock()
+app.my_state = None
 
 
 class StateConditionMiddleware(BaseHTTPMiddleware):
@@ -24,12 +26,12 @@ class StateConditionMiddleware(BaseHTTPMiddleware):
 
     async def dispatch(self, request: Request, call_next):
         if request.method == "POST":
-            shared_globals.state.reset_sound()
+            app.my_state.reset_sound()
         response = await call_next(request)
 
         if request.method == "POST" and response.status_code // 100 == 2:
             logging.info("Propagating state")
-            await send_to_clients(shared_globals.state.to_dict())
+            await send_to_clients(app.my_state.to_dict())
 
         return response
 
@@ -125,7 +127,7 @@ class SetTeams(BaseModel):
     teams: List[List[str]]
 
 
-class Buzz(BaseModel):
+class Buzzer(BaseModel):
     """JSON representation of someone pressing the Buzz"""
 
     controller: int
@@ -140,9 +142,9 @@ def get_state() -> dict:
         dict: JSON response
     """
     return {
-        "currentTeam": shared_globals.state.get_current_team(),
-        "state": shared_globals.state.state,
-        "teams": [p.to_dict() for p in shared_globals.state.list_teams()],
+        "currentTeam": app.my_state.get_current_team(),
+        "state": app.my_state.state,
+        "teams": [p.to_dict() for p in app.my_state.list_teams()],
     }
 
 
@@ -153,7 +155,7 @@ def get_questions() -> list:
     Returns:
         list: JSON response
     """
-    questions = shared_globals.state.list_questions()
+    questions = app.my_state.list_questions()
     categories = list({q.category for q in questions})
     return [[q.to_dict() for q in questions if q.category == c] for c in categories]
 
@@ -168,7 +170,7 @@ def get_winners() -> list:
     return [
         t.to_dict()
         for t in sorted(
-            shared_globals.state.list_teams(), key=lambda p: p.balance, reverse=True
+            app.my_state.list_teams(), key=lambda p: p.balance, reverse=True
         )
     ]
 
@@ -180,7 +182,7 @@ def get_teams() -> list:
     Returns:
         list: JSON response
     """
-    return [p.to_dict() for p in shared_globals.state.list_teams()]
+    return [p.to_dict() for p in app.my_state.list_teams()]
 
 
 @app.get("/question/{idx}", response_model=Question)
@@ -194,7 +196,7 @@ def get_question(idx: int) -> dict:
         dict: JSON response
     """
     print(idx)
-    q = shared_globals.state.get_question(idx)
+    q = app.my_state.get_question(idx)
     if q is None:
         raise HTTPException(status_code=404, detail="Question not found")
     return q.to_dict()
@@ -210,8 +212,8 @@ def post_answer(body: Answer) -> dict:
     Returns:
         dict: JSON response
     """
-    shared_globals.state.answer_question(body.correct)
-    return {"skip": (shared_globals.state.state != 2)}
+    app.my_state.answer_question(body.correct)
+    return {"skip": (app.my_state.state != 2)}
 
 
 @app.post("/skip", response_model=BasicResponse)
@@ -221,7 +223,7 @@ def post_skip() -> dict:
     Returns:
         dict: JSON response
     """
-    shared_globals.state.skip_question()
+    app.my_state.skip_question()
     return {"status": "success"}
 
 
@@ -235,7 +237,7 @@ def post_set_question(body: SetQuestion) -> dict:
     Returns:
         dict: JSON response
     """
-    shared_globals.state.select_question(body.id)
+    app.my_state.select_question(body.id)
     return {"status": "success"}
 
 
@@ -249,21 +251,21 @@ def post_teams(body: SetTeams) -> dict:
     Returns:
         dict: JSON response
     """
-    shared_globals.state.set_teams(body.teams)
+    app.my_state.set_teams(body.teams)
     return {"status": "success"}
 
 
 @app.post("/buzz", response_model=BasicResponse)
-def post_buzz(body: Buzz) -> dict:
+def post_buzz(body: Buzzer) -> dict:
     """set as someone pressing the buzz button
 
     Args:
-        body (Buzz): id of pressed buzz controller
+        body (Buzzer): id of pressed buzz controller
 
     Returns:
         dict: JSON response
     """
-    shared_globals.state.buzz(body.controller, body.color)
+    app.my_state.buzz(body.controller, body.color)
     return {"status": "success"}
 
 
@@ -274,7 +276,7 @@ def post_buzz_start() -> dict:
     Returns:
         dict: JSON response
     """
-    shared_globals.state.set_answering()
+    app.my_state.set_answering()
     return {"status": "success"}
 
 
@@ -285,7 +287,7 @@ def post_stop_timer() -> dict:
     Returns:
         dict: JSON response
     """
-    shared_globals.state.stop_countdown_timer()
+    app.my_state.stop_countdown_timer()
     return {"status": "success"}
 
 
@@ -301,7 +303,7 @@ async def send_to_clients(message: str | dict):
                 await client.send_text(message)
             elif isinstance(message, dict):
                 await client.send_json(message)
-    shared_globals.state.reset_sound()
+    app.my_state.reset_sound()
 
 
 @app.websocket("/ws")
@@ -314,7 +316,7 @@ async def websocket_endpoint(ws: WebSocket):
     await ws.accept()
     async with app.my_clients_lock:
         app.my_clients.add(ws)
-    await ws.send_json(shared_globals.state.to_dict())
+    await ws.send_json(app.my_state.to_dict())
     try:
         while True:
             message = await ws.receive_text()
@@ -326,11 +328,14 @@ async def websocket_endpoint(ws: WebSocket):
         await ws.close()
 
 
-def webserver_thread(host: str, port: int):
+def start(host: str, port: int, controllers_port: int):
     """fuction to start webserver
 
     Args:
         host (str): host server will run on
         port (int): port server will run on
     """
+    buzz_controller = Buzz("localhost", controllers_port)
+    app.my_state = GameState(buzz_controller)
+
     uvicorn.run(app, host=host, port=port, ws="websockets")
