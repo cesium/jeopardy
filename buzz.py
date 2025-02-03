@@ -1,20 +1,26 @@
 """Module responsable for controlling Buzz Controllers"""
 
-import os
 import time
+import os
+import argparse
 import tkinter as tk
 from typing import List
 from abc import abstractmethod
+from threading import Thread
 from easyhid import Enumeration
 import requests
-
-SERVER_PORT = int(os.getenv("SERVER_PORT", "8000"))
+from dotenv import load_dotenv
+from fastapi import FastAPI
+from pydantic import BaseModel
+import uvicorn
 
 
 class BuzzBase:
     """Class for controlling Buzz Controllers"""
 
-    def __init__(self):
+    def __init__(self, host: str, port: int):
+        self.server_url = f"http://{host}:{port}"
+        self.light_array = [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]
         self.button_state = [
             {
                 "red": False,
@@ -54,6 +60,24 @@ class BuzzBase:
             for j in ["red", "yellow", "green", "orange", "blue"]:
                 self.button_state[i][j] = False
 
+    def _handle_buzz_no_confirm(self):
+        """
+        Handles the data from the buzzes
+        """
+
+        for i in range(0, 4):
+            for color, value in self.button_state[i].items():
+                if value:
+                    try:
+                        requests.post(
+                            f"{self.server_url}/buzz",
+                            json={"controller": i, "color": color},
+                            timeout=0.00000000000001,
+                        )
+                    except requests.exceptions.ReadTimeout:
+                        pass
+                    break
+
     def _handle_buzz(self):
         """
         Handles the data from the buzzes
@@ -63,37 +87,28 @@ class BuzzBase:
             for color, value in self.button_state[i].items():
                 if value:
                     requests.post(
-                        f"http://localhost:{SERVER_PORT}/buzz",
+                        f"{self.server_url}/buzz",
                         json={"controller": i, "color": color},
-                        timeout=10000,
+                        timeout=10,
                     )
                     break
 
     @abstractmethod
-    def buzz_thread(self):
+    def start(self):
         """
         Thread that reads the buzzes and calls _handle_buzz
         """
 
-    def turn_light_on(self, controllers: List[int]):
-        """turn the lights of the given controllers on
-        Args:
-            controllers (List[int]): list of controllers to turn on
-        """
-
-    def turn_light_off(self, controllers: List[int]):
-        """turn the lights of the given controllers off
-        Args:
-            controllers (List[int]): list of controllers to turn on
-        """
+    @abstractmethod
+    def update_controllers_lights(self):
+        """turn the lights of the given controllers off"""
 
 
 class Buzz(BuzzBase):
     """Class for controlling Buzz Controllers"""
 
-    def __init__(self):
-        super().__init__()
-        self.light_array = [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]
+    def __init__(self, host: str, port: int):
+        super().__init__(host, port)
 
         en = Enumeration()
         devices = en.find(manufacturer="Namtai")
@@ -101,24 +116,8 @@ class Buzz(BuzzBase):
         self.dev.open()
         self.dev.set_nonblocking(True)
 
-    def turn_light_on(self, controllers: List[int]):
-        """Turn the lights of the given controllers on
-
-        Args:
-            controllers (List[int]): controllers
-        """
-        for i in controllers:
-            self.light_array[i + 1] = 0xFF
-        self.dev.write(self.light_array)
-
-    def turn_light_off(self, controllers: List[int]):
-        """Turn the lights of the given controllers off
-
-        Args:
-            controllers (List[int]): controllers
-        """
-        for i in controllers:
-            self.light_array[i + 1] = 0x00
+    def update_controllers_lights(self):
+        """Update the lights of the controllers"""
         self.dev.write(self.light_array)
 
     def __parse_buzz_data(self, data):
@@ -146,7 +145,7 @@ class Buzz(BuzzBase):
         self.button_state[3]["orange"] = (data[4] & 0x04) != 0  # orange
         self.button_state[3]["blue"] = (data[4] & 0x08) != 0  # blue
 
-    def buzz_thread(self):
+    def start(self):
         """
         Thread that reads the buzzes
         """
@@ -163,36 +162,42 @@ class Buzz(BuzzBase):
 class VirtualBuzz(BuzzBase):
     """Class for Buzz controlling Virtual Buzz Controllers"""
 
+    def __init__(self, host: str, port: int):
+        super().__init__(host, port)
+        self.red_buttons = []
+
     def __update_button_state(self, controller: int, color: str):
         """
-            Trigger when a button is pressed
+        Trigger when a button is pressed.
 
         Args:
-            controller (int): The controller pressed
-            color (str): The coller of the button pressed
+            controller (int): The controller pressed.
+            color (str): The color of the button pressed.
         """
         super()._reset_state()
         self.button_state[controller][color] = True
-        super()._handle_buzz()
+        super()._handle_buzz_no_confirm()
 
     def __create_controller_frame(self, root: tk.Tk, controller_index: int):
-        """creates a virtual buzz controller
+        """Creates a virtual buzz controller.
 
         Args:
-            root (tk.Tk): canvas to add controller to
-            controller_index (int): index of the controller
+            root (tk.Tk): Canvas to add the controller to.
+            controller_index (int): Index of the controller.
         """
         frame = tk.Frame(root, padx=10, pady=10)
         frame.pack(side=tk.LEFT, expand=True, fill=tk.BOTH)
 
-        # Create the big red circle button
-        red_button = tk.Button(
+        b = tk.Button(
             frame,
             text="Red",
-            bg="red",
+            bg="#8B0000",
             command=lambda: self.__update_button_state(controller_index, "red"),
         )
-        red_button.pack(pady=10)
+        b.pack(pady=5)
+
+        # Create the red button
+        self.red_buttons.append(b)
 
         # Create the remaining color buttons
         colors = ["yellow", "green", "orange", "blue"]
@@ -205,9 +210,17 @@ class VirtualBuzz(BuzzBase):
             )
             color_button.pack(pady=5)
 
-    def buzz_thread(self):
+    def update_controllers_lights(self):
         """
-        Thread that creates the virtual buzz controllers
+        Updates the colors of the red circle buttons based on the light array.
+        """
+        for i in range(4):
+            new_color = "#FF0000" if self.light_array[i + 1] == 0xFF else "#8B0000"
+            self.red_buttons[i].config(bg=new_color)
+
+    def start(self):
+        """
+        Thread that creates the virtual buzz controllers.
         """
         root = tk.Tk()
         root.title("Virtual Buzz Controllers")
@@ -216,3 +229,60 @@ class VirtualBuzz(BuzzBase):
             self.__create_controller_frame(root, i)
 
         root.mainloop()
+
+
+if __name__ == "__main__":
+    load_dotenv("backend/.env", override=True)
+    SERVER_PORT = int(os.getenv("SERVER_PORT", "8000"))
+    CONTROLLER_PORT = int(os.getenv("CONTROLLER_PORT", "8001"))
+
+    parser = argparse.ArgumentParser(description="Jeopardy Backend Controller")
+    parser.add_argument(
+        "--virtual", action="store_true", help="Enable virtual buzz buttons."
+    )
+
+    args = parser.parse_args()
+    buzzController = (
+        VirtualBuzz("localhost", SERVER_PORT)
+        if args.virtual
+        else Buzz("localhost", SERVER_PORT)
+    )
+    t = Thread(target=buzzController.start, args=())
+    t.start()
+
+    app = FastAPI()
+
+    class LightRequest(BaseModel):
+        """Request model"""
+
+        controllers: List[int]
+
+    class Reponse(BaseModel):
+        """Response model"""
+
+        status: str
+
+    @app.post("/on", response_model=Reponse)
+    def post_on(body: LightRequest):
+        """Turn the lights of the given controllers on
+        Args:
+            light_request (LightRequest): controllers
+        """
+        for i in body.controllers:
+            buzzController.light_array[i + 1] = 0xFF
+        buzzController.update_controllers_lights()
+        return {"status": "success"}
+
+    @app.post("/off", response_model=Reponse)
+    def post_off(body: LightRequest):
+        """Turn the lights of the given controllers off
+        Args:
+            light_request (LightRequest): controllers
+        """
+        for i in body.controllers:
+            buzzController.light_array[i + 1] = 0x00
+        buzzController.update_controllers_lights()
+        return {"status": "success"}
+
+    uvicorn.run(app, host="0.0.0.0", port=CONTROLLER_PORT)
+    t.join()
