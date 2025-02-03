@@ -324,8 +324,6 @@ async def websocket_endpoint(ws: WebSocket):
     except WebSocketDisconnect:
         async with app.my_clients_lock:
             app.my_clients.remove(ws)
-    finally:
-        await ws.close()
 
 
 def start(host: str, port: int, controllers_port: int):
