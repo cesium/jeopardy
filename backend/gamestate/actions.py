@@ -12,6 +12,7 @@ class Actions:
         self.play_start_accepting: bool = False
         self.play_buzzer_sound: bool = False
         self.stop_countdown: bool = False
+        self.play_end_sound: bool = False
 
     def reset_sound(self):
         """
@@ -21,6 +22,7 @@ class Actions:
         self.play_wrong_sound = False
         self.play_start_accepting = False
         self.play_buzzer_sound = False
+        self.play_end_sound = False
 
     def reset_countdown_timer(self):
         """reset the countdown timer"""
@@ -37,5 +39,6 @@ class Actions:
             "playWrongSound": self.play_wrong_sound,
             "playStartAccepting": self.play_start_accepting,
             "playBuzzerSound": self.play_buzzer_sound,
+            "playEndSound": self.play_end_sound,
             "stopTimer": self.stop_countdown,
         }

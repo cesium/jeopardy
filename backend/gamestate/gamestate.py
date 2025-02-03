@@ -49,6 +49,10 @@ class GameState:
         self.reading_until = time.time_ns()
         self.timeouts = [time.time_ns()] * 4
 
+    def __game_over(self):
+        self.state = States.OVER
+        self.actions.play_end_sound = True
+
     def get_current_team(self) -> Team:
         """return the team playing
 
@@ -118,7 +122,7 @@ class GameState:
         if len(self.sos_steal) == len(self.teams_controller.playing):
             stealers = [i for i, k in self.sos_steal.items() if k]
             self.teams_controller.split_or_steal(stealers)
-            self.state = States.OVER
+            self.__game_over()
 
     def __handle_normal_buzz(self, controller: int, color: str):
         if color == "red":
@@ -195,7 +199,7 @@ class GameState:
             self.teams_controller.playing = list(range(len(t.names)))
             self.state = States.SPLIT_OR_STEAL
         else:
-            self.state = States.OVER
+            self.__game_over()
 
     def __set_reading(self, value: bool):
         self.reading = value
@@ -334,7 +338,7 @@ class GameState:
         self.actions.stop_countdown = True
 
     def get_question(self, idx: int) -> Question:
-        """set a question by id
+        """set a question by idstop_countdown
 
         Args:
             idx (int): the index of the question
