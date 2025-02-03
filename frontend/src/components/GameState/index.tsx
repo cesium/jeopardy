@@ -4,7 +4,7 @@ import GameWaiting from "./GameWaiting";
 import GameOver from "./GameOver";
 import { State } from "../../types";
 import { useCallback, useEffect, useState } from "react";
-import useSound from "use-sound";
+// import useSound from "use-sound";
 import { processState } from "../../lib/utils";
 
 interface GameStateProps {
@@ -89,6 +89,9 @@ export default function GameState({ state, role }: GameStateProps) {
       case 4:
         break;
       case 5:
+        // split or steal
+        break;
+      case 6:
         setSelectingQuestion(false);
         setSelectingQuestionInView(false);
         setAnsweringQuestion(false);

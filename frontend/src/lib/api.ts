@@ -68,3 +68,8 @@ export async function answer(correct: boolean) {
 
   return response.data;
 }
+
+export async function stopTimer() {
+  const response = await API.post("/stop_timer");
+  return response.data;
+}

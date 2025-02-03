@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import useSound from "use-sound";
 import { State } from "../../../types";
 import * as api from "../../../lib/api";
@@ -10,15 +10,15 @@ interface GameAnsweringQuestionProps {
   inView: boolean;
 }
 
-function CountdownTimer({ initialSeconds, refreshRate, endSound }) {
+function CountdownTimer({ initialSeconds, refreshRate, endSound, role }) {
   const [seconds, setSeconds] = useState(initialSeconds);
   const [playEndSound] = useSound("/sounds/wrong.mp3", { interrupt: true });
 
   useEffect(() => setSeconds(initialSeconds), [initialSeconds]);
 
   useEffect(() => {
-    if (seconds <= 0) {
-      if (endSound) playEndSound();
+    if (seconds <= 0 && endSound && role === "viewer") {
+      playEndSound();
       return;
     }
 
@@ -29,7 +29,7 @@ function CountdownTimer({ initialSeconds, refreshRate, endSound }) {
 
     // Clean up the timer
     return () => clearInterval(timer);
-  }, [seconds, refreshRate, endSound, playEndSound]);
+  }, [seconds, refreshRate, endSound, playEndSound, role]);
 
   const percentage = (seconds / initialSeconds) * 100;
 
@@ -49,7 +49,7 @@ export default function GameAnsweringQuestion({
 }: GameAnsweringQuestionProps) {
   const [playTimerSound, { stop }] = useSound("/sounds/timer.mp3", {
     interrupt: true,
-    volume: 4,
+    volume: 2,
   });
   const [playBuzzSound] = useSound("/sounds/buzz.mp3", {
     interrupt: true,
@@ -69,21 +69,43 @@ export default function GameAnsweringQuestion({
   });
   const [started, setStarted] = useState<boolean>(false);
 
+  const timer = useCallback(() => {
+    if (state.state === 4) {
+      const values = new Set(state.questions.map((q) => q.value));
+      const minValue = Math.min(...values);
+      const maxValue = Math.max(...values);
+      const minTimer = 10;
+      const maxTimer = 30;
+      const currentValue = state.currentQuestion.value;
+      const percentage = (currentValue - minValue) / (maxValue - minValue);
+      return minTimer + percentage * (maxTimer - minTimer);
+    }
+    return 10;
+  }, [state]);
+
   useEffect(() => {
     if (role === "viewer") {
-      if (state.playCorrectSound) {
+      if (state.actions.playCorrectSound) {
+        console.log("Playing correct sound");
         playCorrectSound();
       }
-      if (state.playWrongSound) {
+      if (state.actions.playWrongSound) {
+        console.log("Playing wrong sound");
         playWrongSound();
       }
-      if (state.playStartAccepting) {
+      if (state.actions.playStartAccepting) {
+        console.log("Playing start sound");
         playStart();
       }
-      if (state.playBuzzerSound) {
+      if (state.actions.playBuzzerSound) {
+        console.log("Playing buzz sound");
         playBuzzSound();
         setTimeout(() => playTimerSound(), 500);
-        setTimeout(() => stop(), 7000);
+        setTimeout(() => stop(), timer());
+      }
+      if (state.actions.stopTimer) {
+        console.log("Stopping timer");
+        stop();
       }
     }
   }, [
@@ -95,16 +117,20 @@ export default function GameAnsweringQuestion({
     playTimerSound,
     stop,
     role,
+    timer,
   ]);
 
   const startQuestion = () => {
     api.startQuestion().then((_) => setStarted(true));
   };
   const skipQuestion = () => {
-    api.skipQuestion().then((_) => setStarted(false));
+    api.skipQuestion().then((_) => setTimeout(() => setStarted(false), 1000));
   };
   const submit = async (res) => {
     api.answer(res).then((_) => setStarted(false));
+  };
+  const stopTimer = async () => {
+    api.stopTimer();
   };
 
   return (
@@ -114,13 +140,15 @@ export default function GameAnsweringQuestion({
       <div
         className={`${inView ? "opacity-100" : "opacity-0"} transition-all duration-500 w-full h-full flex flex-col items-center justify-center`}
       >
-        {(state.state === 3 || state.state === 4) && (
-          <CountdownTimer
-            initialSeconds={state.state === 4 ? 7 : 10}
-            refreshRate={60}
-            endSound={role === "viewer"}
-          />
-        )}
+        {(state.state === 3 || state.state === 4) &&
+          !state.actions.stopTimer && (
+            <CountdownTimer
+              role={role}
+              initialSeconds={timer()}
+              refreshRate={60}
+              endSound={state.state === 3 ? true : !stopTimer}
+            />
+          )}
         <div className="my-24 text-center">
           <p className="font-extrabold text-3xl uppercase">
             {state.currentQuestion.category}
@@ -151,24 +179,47 @@ export default function GameAnsweringQuestion({
         )}
         {role === "staff" && started && (
           <>
-            <div className="w-3/4 grid grid-cols-2 gap-4 mt-12 m-auto">
-              <button
-                className="w-full bg-red-700 py-2 text-4xl"
-                onClick={(_) => submit(false)}
-              >
-                Errado
-              </button>
-              <button
-                className="w-full bg-green-700 py-2 text-4xl"
-                onClick={(_) => submit(true)}
-              >
-                Certo
-              </button>
-            </div>
+            {state.actions.stopTimer ? (
+              <>
+                <div className="w-3/4 grid grid-cols-2 gap-4 mt-12 m-auto">
+                  <button
+                    className="w-full bg-red-700 py-2 text-4xl"
+                    onClick={(_) => {
+                      submit(false);
+                    }}
+                  >
+                    Errado
+                  </button>
+                  <button
+                    className="w-full bg-green-700 py-2 text-4xl"
+                    onClick={(_) => {
+                      submit(true);
+                    }}
+                  >
+                    Certo
+                  </button>
+                </div>
+              </>
+            ) : (
+              state.state === 4 && (
+                <div className="w-3/4 mt-12 m-auto">
+                  <button
+                    className="w-full bg-accent py-2 text-4xl"
+                    onClick={() => {
+                      stopTimer();
+                    }}
+                  >
+                    Respondeu
+                  </button>
+                </div>
+              )
+            )}
             <div className="w-full flex justify-center items-center">
               <button
                 className="w-3/4 bg-amber-700 py-2 text-4xl mt-4"
-                onClick={(_) => skipQuestion()}
+                onClick={(_) => {
+                  skipQuestion();
+                }}
               >
                 Skip
               </button>
@@ -189,9 +240,18 @@ export default function GameAnsweringQuestion({
           {state.teams.map((p, idx) => (
             <div
               key={`team-${idx}`}
-              className={`mx-12 ${state.state == 4 && state.currentTeam.names == p.names ? "text-primary" : ""}`}
+              className={`mx-12 ${state.state == 4 && state.currentTeam === idx ? "text-primary" : ""}`}
             >
-              <p className="font-extrabold text-4xl">{p.names}</p>
+              <div className="flex flex-col space-y-0.5">
+                {p.names.map((name, index) => (
+                  <p
+                    key={index}
+                    className={`font-extrabold text-4xl ${state.state === 4 && state.currentTeam === idx && "text-primary animate-bounce"}`}
+                  >
+                    {name}
+                  </p>
+                ))}
+              </div>
               <p className="font-bold text-3xl mt-2">{p.balance}</p>
             </div>
           ))}

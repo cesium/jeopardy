@@ -18,11 +18,14 @@ export type State = {
   questions: Question[];
   state: number;
   currentQuestion: Question;
-  currentTeam: Team;
+  currentTeam: number;
   selectingTeam: number;
   alreadyAnswered: number[];
-  playCorrectSound: boolean;
-  playWrongSound: boolean;
-  playStartAccepting: boolean;
-  playBuzzerSound: boolean;
+  actions: {
+    playCorrectSound: boolean;
+    playWrongSound: boolean;
+    playStartAccepting: boolean;
+    playBuzzerSound: boolean;
+    stopTimer: boolean;
+  };
 };

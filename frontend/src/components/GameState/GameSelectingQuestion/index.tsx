@@ -77,7 +77,7 @@ export default function GameSelectingQuestion({
       setLeft(left);
       setTop(top);
     },
-    [cellWidth, columnsNr]
+    [cellWidth, columnsNr],
   );
 
   useEffect(() => {
@@ -131,8 +131,20 @@ export default function GameSelectingQuestion({
       </div>
       <div className="flex items-center justify-center h-full">
         {state.teams.map((p, idx) => (
-          <div key={`team-${idx}`} className="mx-12 uppercase">
-            <p className="font-bold text-4xl">{p.names}</p>
+          <div
+            key={`team-${idx}`}
+            className={`mx-12 uppercase ${state.state === 1 && state.currentTeam === idx && "text-primary"}`}
+          >
+            <div className="flex flex-col space-y-0.5">
+              {p.names.map((name, index) => (
+                <p
+                  key={index}
+                  className={`font-bold text-4xl ${state.state === 1 && state.currentTeam === idx && "animate-bounce"}`}
+                >
+                  {name}
+                </p>
+              ))}
+            </div>
             <p className="font-medium text-3xl mt-2">{p.balance}</p>
           </div>
         ))}
