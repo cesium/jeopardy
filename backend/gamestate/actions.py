@@ -13,6 +13,7 @@ class Actions:
         self.play_buzzer_sound: bool = False
         self.stop_countdown: bool = False
         self.play_end_sound: bool = False
+        self.show_sos: bool = False
 
     def reset_sound(self):
         """
@@ -41,4 +42,5 @@ class Actions:
             "playBuzzerSound": self.play_buzzer_sound,
             "playEndSound": self.play_end_sound,
             "stopTimer": self.stop_countdown,
+            "showSOS": self.show_sos,
         }

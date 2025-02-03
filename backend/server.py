@@ -291,6 +291,28 @@ def post_stop_timer() -> dict:
     return {"status": "success"}
 
 
+@app.post("/show_sos", response_model=BasicResponse)
+def post_show_sos() -> dict:
+    """show SOS
+
+    Returns:
+        dict: JSON response
+    """
+    app.my_state.show_sos()
+    return {"status": "success"}
+
+
+@app.post("/end", response_model=BasicResponse)
+def post_end() -> dict:
+    """end the game
+
+    Returns:
+        dict: JSON response
+    """
+    app.my_state.end_game()
+    return {"status": "success"}
+
+
 async def send_to_clients(message: str | dict):
     """Broadcast a message to every websocket connected
 

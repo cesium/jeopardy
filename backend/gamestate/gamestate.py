@@ -27,7 +27,7 @@ class States(Enum):
     ANSWERING_QUESTION = 3
     TEAM_SELECTED = 4
     SPLIT_OR_STEAL = 5
-    OVER = 6
+    OVER = 7
 
 
 class GameState:
@@ -61,15 +61,7 @@ class GameState:
         """
         return self.teams_controller.get_current_team()
 
-    def get_controllers_answered_current_question(self) -> List[int]:
-        """return the controllers that answered the current question
-
-        Returns:
-            List[int]: list of controllers that answered the current question
-        """
-        return self.controllers_used_in_current_question
-
-    def get_allowed_controllers(self) -> List[int]:
+    def __get_allowed_controllers(self) -> List[int]:
         """return the controllers that are allowed to play
 
         Returns:
@@ -112,17 +104,29 @@ class GameState:
 
         Args:
             controller (int): controller that is splitting or stealing
-            option (bool): the option the controller chose
+            option (bool): controller chose steal
         """
         logging.debug("Split or Steal: %d %s", controller, option)
         self.controllers_used_in_current_question.append(controller)
         self.sos_steal[controller] = option
-        print(self.sos_steal)
-        print(self.teams_controller.playing)
+        self.actions.play_buzzer_sound = True
         if len(self.sos_steal) == len(self.teams_controller.playing):
             stealers = [i for i, k in self.sos_steal.items() if k]
             self.teams_controller.split_or_steal(stealers)
-            self.__game_over()
+
+    def show_sos(self):
+        """ show the split or steal options"""
+        self.actions.show_sos = True
+
+    def end_game(self):
+        """end the game"""
+        self.__game_over()
+
+    def __get_sos_values(self):
+        l = []
+        for i in self.teams_controller.playing:
+            l.append(self.sos_steal[i] if i in self.sos_steal else None)
+        return l
 
     def __handle_normal_buzz(self, controller: int, color: str):
         if color == "red":
@@ -276,6 +280,9 @@ class GameState:
                 selecting_team.id if selecting_team is not None else None
             ),
             "alreadyAnswered": self.controllers_used_in_current_question,
+            "SOSAnswers": (
+                self.__get_sos_values() if self.state == States.SPLIT_OR_STEAL else None
+            ),
             "actions": self.actions.to_dict(),
         }
 
@@ -290,7 +297,7 @@ class GameState:
         """
         return (
             not self.team_already_answered(team_id)
-            and team_id in self.get_allowed_controllers()
+            and team_id in self.__get_allowed_controllers()
         )
 
     def get_teams_allowed_to_play(self) -> List[int]:
@@ -300,7 +307,7 @@ class GameState:
             List[int]: teams allowed to play
         """
         return list(
-            set(self.get_allowed_controllers())
+            set(self.__get_allowed_controllers())
             - set(self.controllers_used_in_current_question)
         )
 
