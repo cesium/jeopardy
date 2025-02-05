@@ -27,7 +27,7 @@ class States(Enum):
     ANSWERING_QUESTION = 3
     TEAM_SELECTED = 4
     SPLIT_OR_STEAL = 5
-    OVER = 7
+    OVER = 6
 
 
 class GameState:
@@ -110,17 +110,21 @@ class GameState:
         self.controllers_used_in_current_question.append(controller)
         self.sos_steal[controller] = option
         self.actions.play_buzzer_sound = True
-        if len(self.sos_steal) == len(self.teams_controller.playing):
-            stealers = [i for i, k in self.sos_steal.items() if k]
-            self.teams_controller.split_or_steal(stealers)
 
     def show_sos(self):
-        """ show the split or steal options"""
+        """show the split or steal options"""
         self.actions.show_sos = True
 
     def end_game(self):
         """end the game"""
-        self.__game_over()
+        if (
+            self.state == States.SPLIT_OR_STEAL
+            and self.actions.show_sos
+            and len(self.sos_steal) == len(self.teams_controller.playing)
+        ):
+            stealers = [i for i, k in self.sos_steal.items() if k]
+            self.teams_controller.split_or_steal(stealers)
+            self.__game_over()
 
     def __get_sos_values(self):
         l = []
