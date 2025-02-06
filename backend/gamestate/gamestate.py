@@ -161,12 +161,13 @@ class GameState:
         if self.reading:
             if color in {"green", "orange"}:
                 self.controllers_used_in_current_question.append(controller)
-            if color == "green":
-                logging.info("SOS SPLIT")
-                self.__split_or_steal(controller, False)
-            elif color == "orange":
-                logging.info("SOS STEAL")
-                self.__split_or_steal(controller, True)
+                if color == "green":
+                    logging.info("SOS SPLIT")
+                    self.__split_or_steal(controller, False)
+                elif color == "orange":
+                    logging.info("SOS STEAL")
+                    self.__split_or_steal(controller, True)
+                self.controllers.turn_light_off([controller])
         else:
             logging.info("NOT READING")
 
