@@ -1,3 +1,4 @@
+# pylint: disable=too-many-instance-attributes
 """
     This module contains the Actions class which is used to control the actions of the game
 """
@@ -14,6 +15,7 @@ class Actions:
         self.stop_countdown: bool = False
         self.play_end_sound: bool = False
         self.show_sos: bool = False
+        self.play_theme_song: bool = True
 
     def reset_sound(self):
         """
@@ -24,6 +26,7 @@ class Actions:
         self.play_start_accepting = False
         self.play_buzzer_sound = False
         self.play_end_sound = False
+        self.play_theme_song = False
 
     def reset_countdown_timer(self):
         """reset the countdown timer"""
@@ -41,6 +44,7 @@ class Actions:
             "playStartAccepting": self.play_start_accepting,
             "playBuzzerSound": self.play_buzzer_sound,
             "playEndSound": self.play_end_sound,
+            "playThemeSong": self.play_theme_song,
             "stopTimer": self.stop_countdown,
             "showSOS": self.show_sos,
         }

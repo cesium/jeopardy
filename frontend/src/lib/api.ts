@@ -73,3 +73,28 @@ export async function stopTimer() {
   const response = await API.post("/stop_timer");
   return response.data;
 }
+
+export async function fixSelectingTeam(team: number) {
+  const response = await API.post("/fix/selecting/", {
+    team_id: team,
+  });
+
+  return response.data;
+}
+
+export async function fixState(state: number) {
+  const response = await API.post("/fix/state/", {
+    state: state,
+  });
+
+  return response.data;
+}
+
+export async function fixPoints(team: number, points: number) {
+  const response = await API.post("/fix/points/", {
+    team_id: team,
+    points: points,
+  });
+
+  return response.data;
+}
