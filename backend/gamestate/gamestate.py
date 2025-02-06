@@ -113,17 +113,14 @@ class GameState:
 
     def show_sos(self):
         """show the split or steal options"""
-        self.actions.show_sos = True
+        if len(self.sos_steal) == len(self.teams_controller.playing):
+            self.actions.show_sos = True
+            stealers = [i for i, k in self.sos_steal.items() if k]
+            self.teams_controller.split_or_steal(stealers)
 
     def end_game(self):
         """end the game"""
-        if (
-            self.state == States.SPLIT_OR_STEAL
-            and self.actions.show_sos
-            and len(self.sos_steal) == len(self.teams_controller.playing)
-        ):
-            stealers = [i for i, k in self.sos_steal.items() if k]
-            self.teams_controller.split_or_steal(stealers)
+        if self.state == States.SPLIT_OR_STEAL and self.actions.show_sos:
             self.__game_over()
 
     def __get_sos_values(self):
