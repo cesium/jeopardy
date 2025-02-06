@@ -78,6 +78,7 @@ export default function GameAnsweringQuestion({
       const maxTimer = 30;
       const currentValue = state.currentQuestion.value;
       const percentage = (currentValue - minValue) / (maxValue - minValue);
+      console.log(minTimer + percentage * (maxTimer - minTimer));
       return minTimer + percentage * (maxTimer - minTimer);
     }
     return 10;

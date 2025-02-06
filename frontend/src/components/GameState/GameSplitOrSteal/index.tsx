@@ -167,10 +167,13 @@ export default function GameSplitOrSteal({
               className={`w-full h-full flex flex-col justify-center items-center bg-accent/50 drop-shadow-lg text-9xl ${state.SOSAnswers.filter((r) => r).length === 1 || state.SOSAnswers.every((r) => r) ? "bg-red-700/50" : "bg-green-700/50"} ${fadeReveal ? "opacity-100" : "opacity-0"} transition-all duration-1000`}
             >
               <div className="flex gap-10 items-center">
-                {state.SOSAnswers.filter((r) => r).length === 1 &&
-                  winningTeam().names.map((name, idx) => {
-                    return <p key={idx}>{name}</p>;
-                  })}
+                {state.SOSAnswers.filter((r) => r).length === 1 && (
+                  <p>
+                    {winningTeam().names.find(
+                      (_, idx) => state.SOSAnswers[idx]
+                    )}
+                  </p>
+                )}
               </div>
               <h1 className="text-[16rem] animate-pulse text-center">
                 {state.SOSAnswers.every((r) => r)

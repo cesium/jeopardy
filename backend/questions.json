@@ -6,14 +6,30 @@
                 "answer": "Merge Sort",
                 "image": "",
                 "value": 100
-            }
-        ],
-        "Hardware": [
+            },
             {
-                "question": "O que significa GPU?",
-                "answer": "Graphics Processing Units",
+                "question": "O algoritmo de ordenação que divide um array em duas metades, ordena recursivamente cada metade e depois combina as partes ordenadas é o algoritmo de ____________ ?",
+                "answer": "Merge Sort",
                 "image": "",
-                "value": 100
+                "value": 200
+            },
+            {
+                "question": "O algoritmo de ordenação que divide um array em duas metades, ordena recursivamente cada metade e depois combina as partes ordenadas é o algoritmo de ____________ ?",
+                "answer": "Merge Sort",
+                "image": "",
+                "value": 300
+            },
+            {
+                "question": "O algoritmo de ordenação que divide um array em duas metades, ordena recursivamente cada metade e depois combina as partes ordenadas é o algoritmo de ____________ ?",
+                "answer": "Merge Sort",
+                "image": "",
+                "value": 400
+            },
+            {
+                "question": "O algoritmo de ordenação que divide um array em duas metades, ordena recursivamente cada metade e depois combina as partes ordenadas é o algoritmo de ____________ ?",
+                "answer": "Merge Sort",
+                "image": "",
+                "value": 500
             }
         ]
     },
