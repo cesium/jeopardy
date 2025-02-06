@@ -282,7 +282,7 @@ class GameState:
             ),
             "alreadyAnswered": self.controllers_used_in_current_question,
             "SOSAnswers": (
-                self.__get_sos_values() if self.state == States.SPLIT_OR_STEAL else []
+                self.__get_sos_values() if self.state >= States.SPLIT_OR_STEAL else []
             ),
             "actions": self.actions.to_dict(),
         }
