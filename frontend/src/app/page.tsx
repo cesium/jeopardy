@@ -30,8 +30,8 @@ const Viewer = () => {
       {!interacted && (
         <div className="absolute w-screen h-screen flex items-center justify-center">
           <button
-            className="text-white bg-primary mt-12 py-2 px-4 text-3xl font-extrabold w-fit"
-            onClick={(_) => setInteracted(true)}
+            className="text-white bg-accent rounded-sm mt-12 py-2 px-4 text-3xl font-extrabold w-fit"
+            onClick={() => setInteracted(true)}
           >
             JOGAR
           </button>

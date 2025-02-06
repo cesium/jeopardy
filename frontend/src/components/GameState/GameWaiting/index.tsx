@@ -9,7 +9,7 @@ import useSound from "use-sound";
 
 interface GameWaitingProps {
   state: State;
-  role: string;
+  role: "viewer" | "staff" | "host";
 }
 
 function PlayerInput({ id, onChange }) {
@@ -73,8 +73,8 @@ function GameWaitingStaff({ state }: GameWaitingProps) {
           <PlayerInput key={i} id={i + 1} onChange={(n) => updateNames(n, i)} />
         ))}
         <button
-          className="py-4 w-full m-auto mt-8 bg-green-700 uppercase text-xl"
-          onClick={(_) => submit()}
+          className="py-4 w-full m-auto mt-8 bg-green-700 uppercase text-xl rounded-sm"
+          onClick={() => submit()}
         >
           Start
         </button>

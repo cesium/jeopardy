@@ -5,7 +5,7 @@ import * as api from "../../../lib/api";
 
 interface GameAnsweringQuestionProps {
   state: State;
-  role: string;
+  role: "viewer" | "staff" | "host";
   fadeOut: boolean;
   inView: boolean;
 }
@@ -86,25 +86,20 @@ export default function GameAnsweringQuestion({
   useEffect(() => {
     if (role === "viewer") {
       if (state.actions.playCorrectSound) {
-        console.log("Playing correct sound");
         playCorrectSound();
       }
       if (state.actions.playWrongSound) {
-        console.log("Playing wrong sound");
         playWrongSound();
       }
       if (state.actions.playStartAccepting) {
-        console.log("Playing start sound");
         playStart();
       }
       if (state.actions.playBuzzerSound) {
-        console.log("Playing buzz sound");
         playBuzzSound();
         setTimeout(() => playTimerSound(), 500);
         setTimeout(() => stop(), timer());
       }
       if (state.actions.stopTimer) {
-        console.log("Stopping timer");
         stop();
       }
     }
@@ -121,13 +116,13 @@ export default function GameAnsweringQuestion({
   ]);
 
   const startQuestion = () => {
-    api.startQuestion().then((_) => setStarted(true));
+    api.startQuestion().then(() => setStarted(true));
   };
   const skipQuestion = () => {
-    api.skipQuestion().then((_) => setTimeout(() => setStarted(false), 1000));
+    api.skipQuestion().then(() => setTimeout(() => setStarted(false), 1000));
   };
   const submit = async (res) => {
-    api.answer(res).then((_) => setStarted(false));
+    api.answer(res).then(() => setStarted(false));
   };
   const stopTimer = async () => {
     api.stopTimer();
@@ -183,16 +178,16 @@ export default function GameAnsweringQuestion({
               <>
                 <div className="w-3/4 grid grid-cols-2 gap-4 mt-12 m-auto">
                   <button
-                    className="w-full bg-red-700 py-2 text-4xl"
-                    onClick={(_) => {
+                    className="w-full bg-red-700 py-2 text-4xl rounded-sm"
+                    onClick={() => {
                       submit(false);
                     }}
                   >
                     Errado
                   </button>
                   <button
-                    className="w-full bg-green-700 py-2 text-4xl"
-                    onClick={(_) => {
+                    className="w-full bg-green-700 py-2 text-4xl rounded-sm"
+                    onClick={() => {
                       submit(true);
                     }}
                   >
@@ -204,7 +199,7 @@ export default function GameAnsweringQuestion({
               state.state === 4 && (
                 <div className="w-3/4 mt-12 m-auto">
                   <button
-                    className="w-full bg-accent py-2 text-4xl"
+                    className="w-full bg-accent py-2 text-4xl rounded-sm"
                     onClick={() => {
                       stopTimer();
                     }}
@@ -216,8 +211,8 @@ export default function GameAnsweringQuestion({
             )}
             <div className="w-full flex justify-center items-center">
               <button
-                className="w-3/4 bg-amber-700 py-2 text-4xl mt-4"
-                onClick={(_) => {
+                className="w-3/4 bg-amber-700 py-2 text-4xl mt-4 rounded-sm"
+                onClick={() => {
                   skipQuestion();
                 }}
               >
@@ -229,8 +224,8 @@ export default function GameAnsweringQuestion({
         {role == "staff" && !started && (
           <div className="w-full flex content-center">
             <button
-              className="w-1/2 m-auto mt-12 bg-yellow-700 py-2 text-4xl"
-              onClick={(_) => startQuestion()}
+              className="w-1/2 m-auto mt-12 bg-yellow-700 py-2 text-4xl rounded-sm"
+              onClick={() => startQuestion()}
             >
               Aceitar Buzz
             </button>

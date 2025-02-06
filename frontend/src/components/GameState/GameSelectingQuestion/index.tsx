@@ -5,7 +5,7 @@ import * as api from "../../../lib/api";
 
 interface GameSelectingQuestionProps {
   state: State;
-  role: string;
+  role: "viewer" | "staff" | "host";
   startOpenAnimation: boolean;
   inView: boolean;
   animationPosition: number;
@@ -119,7 +119,7 @@ export default function GameSelectingQuestion({
             className={`bg-gradient-to-br from-accent/90 to-accent/40 backdrop-blur-md text-primary p-10 rounded-md flex space-x-2 place-content-center h-[140px] items-center ${q.answered && "opacity-40"} ${!q.answered && role === "staff" && "hover:border"} border-primary`}
             key={`question-${idx}`}
             disabled={q.answered || role !== "staff"}
-            onClick={(_) => setQuestion(q.id)}
+            onClick={() => setQuestion(q.id)}
           >
             {!q.answered && (
               <p className="text-8xl drop-shadow-lg">

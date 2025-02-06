@@ -21,11 +21,14 @@ export type State = {
   currentTeam: number;
   selectingTeam: number;
   alreadyAnswered: number[];
+  SOSAnswers: boolean[];
   actions: {
     playCorrectSound: boolean;
     playWrongSound: boolean;
     playStartAccepting: boolean;
     playBuzzerSound: boolean;
+    playEndSound: boolean;
     stopTimer: boolean;
+    showSOS: boolean;
   };
 };

@@ -73,3 +73,13 @@ export async function stopTimer() {
   const response = await API.post("/stop_timer");
   return response.data;
 }
+
+export async function showSOSResults() {
+  const response = await API.post("/show_sos");
+  return response.data;
+}
+
+export async function endGame() {
+  const response = await API.post("/end");
+  return response.data;
+}

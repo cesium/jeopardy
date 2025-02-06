@@ -28,6 +28,12 @@ module.exports = {
     {
       pattern: /grid-cols-(\d)/,
     },
+    {
+      pattern: /from-accent\/(\d)/,
+    },
+    {
+      pattern: /to-accent\/(\d)/,
+    },
   ],
   plugins: [],
 };
