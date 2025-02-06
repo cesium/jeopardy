@@ -192,13 +192,13 @@ class GameState:
                 self.questions_controller.tiebreak()
                 self.state = States.READING_QUESTION
             else:
-                self.__end_game()
+                self.__goto_end_game()
         else:
             self.state = States.SELECTING_QUESTION
         self.__set_reading(False)
         self.actions.reset_countdown_timer()
 
-    def __end_game(self):
+    def __goto_end_game(self):
         t = self.teams_controller.get_winning_team()
         if len(t.names) > 1 and SPLIT_OR_STEAL:
             self.teams_controller.playing = list(range(len(t.names)))
@@ -258,7 +258,7 @@ class GameState:
                 self.questions_controller.tiebreak()
                 self.state = States.READING_QUESTION
             else:
-                self.__end_game()
+                self.__goto_end_game()
         self.__set_reading(False)
         self.actions.reset_countdown_timer()
 
