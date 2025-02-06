@@ -142,3 +142,12 @@ class TeamsController:
             List[Team]: list of teams in the game
         """
         return self.teams.copy()
+
+    def add_points(self, team_id: int, points: int):
+        """add points to a team
+
+        Args:
+            team_id (int): id of the team
+            points (int): points to add
+        """
+        self.get_team(team_id).balance += points

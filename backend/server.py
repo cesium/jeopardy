@@ -313,6 +313,67 @@ def post_end() -> dict:
     return {"status": "success"}
 
 
+class ArdeuPontos(BaseModel):
+    """JSON representation needing to alter a team's points"""
+
+    team_id: int
+    points: int
+
+
+@app.post("/ardeu/pontos/", response_model=BasicResponse)
+def post_ardeu_pontos(body: ArdeuPontos) -> dict:
+    """add/subtract points to a team
+
+    Args:
+        body (ArdeuPontos): body of the request
+
+    Returns:
+        dict: JSON response
+    """
+    app.my_state.add_points(body.team_id, body.points)
+    return {"status": "success"}
+
+
+class ArdeuState(BaseModel):
+    """JSON representation needing to alter a team's points"""
+
+    state: int
+
+
+@app.post("/ardeu/state/", response_model=BasicResponse)
+def post_ardeu_state(body: ArdeuState) -> dict:
+    """change the state of the game
+
+    Args:
+        body (ArdeuState): body of the request
+
+    Returns:
+        dict: JSON response
+    """
+    app.my_state.set_state(body.state)
+    return {"status": "success"}
+
+
+class ArdeuSelecting(BaseModel):
+    """JSON representation needing to alter a team's points"""
+
+    team_id: int
+
+
+@app.post("/ardeu/selecting/", response_model=BasicResponse)
+def post_ardeu_selecting(body: ArdeuSelecting) -> dict:
+    """change the selecting team of the game
+
+    Args:
+        body (ArdeuSelecting): body of the request
+
+    Returns:
+        dict: JSON response
+    """
+    app.my_state.set_selecting(body.team_id)
+    return {"status": "success"}
+
+
 async def send_to_clients(message: str | dict):
     """Broadcast a message to every websocket connected
 

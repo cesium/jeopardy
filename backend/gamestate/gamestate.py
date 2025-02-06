@@ -49,6 +49,22 @@ class GameState:
         self.reading_until = time.time_ns()
         self.timeouts = [time.time_ns()] * 4
 
+    def set_state(self, state: int):
+        """set the state of the game
+
+        Args:
+            state (int): the state to set
+        """
+        self.state = States(state)
+
+    def set_selecting(self, team_idx: int):
+        """set a team as selecting
+
+        Args:
+            team_idx (int): the id of the team
+        """
+        self.teams_controller.set_selecting(team_idx)
+
     def __game_over(self):
         self.state = States.OVER
         self.actions.play_end_sound = True
@@ -163,7 +179,7 @@ class GameState:
         """
         logging.info("BUZZ: %d %s", controller, color)
 
-        if self.team_allowed_to_play(controller):
+        if self.__team_allowed_to_play(controller):
             if self.state == States.SPLIT_OR_STEAL:
                 self.__handle_sos_buzz(controller, color)
             else:
@@ -210,7 +226,7 @@ class GameState:
         self.reading = value
         try:
             if value:
-                self.controllers.turn_light_on(self.get_teams_allowed_to_play())
+                self.controllers.turn_light_on(self.__get_teams_allowed_to_play())
             else:
                 self.controllers.turn_light_off([0, 1, 2, 3])
         except requests_ConnectionError:
@@ -262,6 +278,9 @@ class GameState:
         self.__set_reading(False)
         self.actions.reset_countdown_timer()
 
+    def __return_sos_answers(self):
+        return self.state in {States.SPLIT_OR_STEAL, States.OVER}
+
     def to_dict(self) -> dict:
         """
             cast the state as a dictionary to represent as json object
@@ -282,12 +301,21 @@ class GameState:
             ),
             "alreadyAnswered": self.controllers_used_in_current_question,
             "SOSAnswers": (
-                self.__get_sos_values() if self.state >= States.SPLIT_OR_STEAL else []
+                self.__get_sos_values() if self.__return_sos_answers() else []
             ),
             "actions": self.actions.to_dict(),
         }
 
-    def team_allowed_to_play(self, team_id: int) -> bool:
+    def add_points(self, team_id: int, points: int):
+        """add points to a team
+
+        Args:
+            team_id (int): the id of the team
+            points (int): the points to add
+        """
+        self.teams_controller.add_points(team_id, points)
+
+    def __team_allowed_to_play(self, team_id: int) -> bool:
         """check if a team is allowed to play
 
         Args:
@@ -301,7 +329,7 @@ class GameState:
             and team_id in self.__get_allowed_controllers()
         )
 
-    def get_teams_allowed_to_play(self) -> List[int]:
+    def __get_teams_allowed_to_play(self) -> List[int]:
         """list teams allowed to play
 
         Returns:
