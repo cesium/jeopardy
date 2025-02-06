@@ -115,8 +115,8 @@ class GameState:
         """show the split or steal options"""
         if len(self.sos_steal) == len(self.teams_controller.playing):
             self.actions.show_sos = True
-            stealers = [i for i, k in self.sos_steal.items() if k]
-            self.teams_controller.split_or_steal(stealers)
+            # stealers = [i for i, k in self.sos_steal.items() if k]
+            # self.teams_controller.split_or_steal(stealers)
 
     def end_game(self):
         """end the game"""
