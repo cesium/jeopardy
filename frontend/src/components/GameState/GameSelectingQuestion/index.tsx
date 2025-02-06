@@ -133,13 +133,13 @@ export default function GameSelectingQuestion({
         {state.teams.map((p, idx) => (
           <div
             key={`team-${idx}`}
-            className={`mx-12 uppercase ${state.state === 1 && state.currentTeam === idx && "text-primary"}`}
+            className={`mx-12 uppercase ${state.state === 1 && state.selectingTeam === idx && "text-primary"}`}
           >
             <div className="flex flex-col space-y-0.5">
               {p.names.map((name, index) => (
                 <p
                   key={index}
-                  className={`font-bold text-4xl ${state.state === 1 && state.currentTeam === idx && "animate-bounce"}`}
+                  className={`font-bold text-4xl ${state.state === 1 && state.selectingTeam === idx && "animate-bounce"}`}
                 >
                   {name}
                 </p>

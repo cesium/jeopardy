@@ -313,19 +313,19 @@ def post_end() -> dict:
     return {"status": "success"}
 
 
-class ArdeuPontos(BaseModel):
+class FixPoints(BaseModel):
     """JSON representation needing to alter a team's points"""
 
     team_id: int
     points: int
 
 
-@app.post("/ardeu/pontos/", response_model=BasicResponse)
-def post_ardeu_pontos(body: ArdeuPontos) -> dict:
+@app.post("/fix/points/", response_model=BasicResponse)
+def post_fix_pontos(body: FixPoints) -> dict:
     """add/subtract points to a team
 
     Args:
-        body (ArdeuPontos): body of the request
+        body (FixPoints): body of the request
 
     Returns:
         dict: JSON response
@@ -334,18 +334,18 @@ def post_ardeu_pontos(body: ArdeuPontos) -> dict:
     return {"status": "success"}
 
 
-class ArdeuState(BaseModel):
+class FixState(BaseModel):
     """JSON representation needing to alter a team's points"""
 
     state: int
 
 
-@app.post("/ardeu/state/", response_model=BasicResponse)
-def post_ardeu_state(body: ArdeuState) -> dict:
+@app.post("/fix/state/", response_model=BasicResponse)
+def post_fix_state(body: FixState) -> dict:
     """change the state of the game
 
     Args:
-        body (ArdeuState): body of the request
+        body (FixState): body of the request
 
     Returns:
         dict: JSON response
@@ -354,18 +354,18 @@ def post_ardeu_state(body: ArdeuState) -> dict:
     return {"status": "success"}
 
 
-class ArdeuSelecting(BaseModel):
+class FixSelecting(BaseModel):
     """JSON representation needing to alter a team's points"""
 
     team_id: int
 
 
-@app.post("/ardeu/selecting/", response_model=BasicResponse)
-def post_ardeu_selecting(body: ArdeuSelecting) -> dict:
+@app.post("/fix/selecting/", response_model=BasicResponse)
+def post_fix_selecting(body: FixSelecting) -> dict:
     """change the selecting team of the game
 
     Args:
-        body (ArdeuSelecting): body of the request
+        body (FixSelecting): body of the request
 
     Returns:
         dict: JSON response
