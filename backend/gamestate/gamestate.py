@@ -33,7 +33,7 @@ class States(Enum):
 class GameState:
     """Class to store the state of the game"""
 
-    def __init__(self, controllers: Buzz):
+    def __init__(self, buzz_host: str, buzz_port: int):
         self.questions_controller = QuestionsController()
         self.teams_controller = TeamsController()
         self.state: States = States.STARTING
@@ -43,7 +43,7 @@ class GameState:
 
         self.sos_steal = {}
 
-        self.controllers = controllers
+        self.controllers = Buzz(buzz_host, buzz_port)
         self.reading = False
         self.__set_reading(False)
         self.reading_until = time.time_ns()

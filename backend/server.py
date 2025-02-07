@@ -4,13 +4,15 @@
 from asyncio import Lock
 from typing import List
 import logging
+import os
+import pickle
+from time import time
 from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from starlette.middleware.base import BaseHTTPMiddleware
 import uvicorn
-from buzz_interface import Buzz
 from gamestate.gamestate import GameState
 
 # Initialize FastAPI app
@@ -387,6 +389,34 @@ async def send_to_clients(message: str | dict):
             elif isinstance(message, dict):
                 await client.send_json(message)
     app.my_state.reset_sound()
+    save_state(app.my_state)
+
+
+def save_state(state: GameState):
+    """save the current game state
+
+    Args:
+        state (GameState): the current game state
+    """
+    with open(f"backend/saves/{int(time())}.pkl", "wb") as f:
+        pickle.dump(state, f)
+
+
+def get_last_save() -> GameState | None:
+    """get the last saved game state
+
+    Returns:
+        GameState | None: the last saved game state | None if there is no saved state
+    """
+    saves = os.listdir("backend/saves")
+    if saves:
+        _, last_save = sorted(
+            map(lambda x: (int(x.split(".")[0]), x), saves), key=lambda x: x[0]
+        )[-1]
+        with open(f"backend/saves/{last_save}", "rb") as f:
+            return pickle.load(f)
+    else:
+        return None
 
 
 @app.websocket("/ws")
@@ -416,7 +446,11 @@ def start(host: str, port: int, controllers_port: int):
         host (str): host server will run on
         port (int): port server will run on
     """
-    buzz_controller = Buzz("localhost", controllers_port)
-    app.my_state = GameState(buzz_controller)
+    if not os.path.exists("backend/saves"):
+        os.mkdir("backend/saves")
+
+    app.my_state = get_last_save()
+    if app.my_state is None:
+        app.my_state = GameState("localhost", controllers_port)
 
     uvicorn.run(app, host=host, port=port, ws="websockets")
