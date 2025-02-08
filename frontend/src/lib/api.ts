@@ -108,3 +108,15 @@ export async function fixPoints(team: number, points: number) {
 
   return response.data;
 }
+
+export async function fixListSaves() {
+  const response = await API.get("/fix/saves/");
+  return response.data;
+}
+
+export async function fixSaves(save: string) {
+  const response = await API.post("/fix/saves/",{
+    name: save,
+  });
+  return response.data;
+}

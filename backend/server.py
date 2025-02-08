@@ -5,14 +5,13 @@ from asyncio import Lock
 from typing import List
 import logging
 import os
-import pickle
-from time import time
 from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from starlette.middleware.base import BaseHTTPMiddleware
 import uvicorn
+from saves import get_last_save, get_saves_names, load_save, save_state
 from gamestate.gamestate import GameState
 
 # Initialize FastAPI app
@@ -33,7 +32,9 @@ class StateConditionMiddleware(BaseHTTPMiddleware):
 
         if request.method == "POST" and response.status_code // 100 == 2:
             logging.info("Propagating state")
-            await send_to_clients(app.my_state.to_dict())
+            await send_to_clients(
+                app.my_state.to_dict(), request.url.path.replace("/", "")
+            )
 
         return response
 
@@ -376,11 +377,45 @@ def post_fix_selecting(body: FixSelecting) -> dict:
     return {"status": "success"}
 
 
-async def send_to_clients(message: str | dict):
+@app.get("/fix/saves/", response_model=list[str])
+def get_fix_saves() -> list:
+    """list all saved game states
+
+    Returns:
+        list: JSON response
+    """
+    return list(map(lambda x: x[1], get_saves_names()))
+
+
+class FixSave(BaseModel):
+    """JSON representation for reverting to a saved game state"""
+
+    name: str
+
+
+@app.post("/fix/saves/", response_model=BasicResponse)
+def post_fix_saves(body: FixSave) -> dict:
+    """revert to a saved game state
+
+    Args:
+        body (FixSave): body of the request
+
+    Returns:
+        dict: JSON response
+    """
+    state = load_save(body.name)
+    if state is None:
+        raise HTTPException(status_code=404, detail="Save not found")
+    app.my_state = state
+    return {"status": "success"}
+
+
+async def send_to_clients(message: str | dict, action: str):
     """Broadcast a message to every websocket connected
 
     Args:
         message (str|dict): the message to broadcast
+        action (str): the action that triggered the message
     """
     async with app.my_clients_lock:
         for client in list(app.my_clients):
@@ -389,34 +424,7 @@ async def send_to_clients(message: str | dict):
             elif isinstance(message, dict):
                 await client.send_json(message)
     app.my_state.reset_sound()
-    save_state(app.my_state)
-
-
-def save_state(state: GameState):
-    """save the current game state
-
-    Args:
-        state (GameState): the current game state
-    """
-    with open(f"backend/saves/{int(time())}.pkl", "wb") as f:
-        pickle.dump(state, f)
-
-
-def get_last_save() -> GameState | None:
-    """get the last saved game state
-
-    Returns:
-        GameState | None: the last saved game state | None if there is no saved state
-    """
-    saves = os.listdir("backend/saves")
-    if saves:
-        _, last_save = sorted(
-            map(lambda x: (int(x.split(".")[0]), x), saves), key=lambda x: x[0]
-        )[-1]
-        with open(f"backend/saves/{last_save}", "rb") as f:
-            return pickle.load(f)
-    else:
-        return None
+    save_state(app.my_state, action)
 
 
 @app.websocket("/ws")
@@ -433,7 +441,7 @@ async def websocket_endpoint(ws: WebSocket):
     try:
         while True:
             message = await ws.receive_text()
-            send_to_clients(message)
+            send_to_clients(message, "ws_message_recieved")
     except WebSocketDisconnect:
         async with app.my_clients_lock:
             app.my_clients.remove(ws)
