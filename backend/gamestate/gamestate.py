@@ -2,6 +2,7 @@
 """Module responsable for storing the state of the game"""
 
 from enum import Enum
+from threading import Thread
 from typing import List
 import os
 import time
@@ -15,7 +16,6 @@ from .models import Team, Question
 
 SPLIT_OR_STEAL = bool(os.getenv("USE_SPLIT_OR_STEAL", "True"))
 BUZZ_PENALTY_TIMEOUT = int(os.getenv("BUZZ_PENALTY_TIMEOUT", "5")) * 1e9
-TIME_TO_ANSWER = int(os.getenv("TIME_TO_ANSWER", "20")) * 1e9
 
 
 class States(Enum):
@@ -153,6 +153,8 @@ class GameState:
                         logging.info("TIMEOUT")
                     else:
                         self.set_current_team(controller)
+                else:
+                    logging.info("OUT OF TIME")
             else:
                 logging.info("NOT READING")
                 self.timeouts[controller] = time.time_ns() + BUZZ_PENALTY_TIMEOUT
@@ -234,12 +236,38 @@ class GameState:
         except requests_ConnectionError:
             logging.error("Failed to connect to buzz controllers")
 
+    def __get_time_to_answer(self) -> int:
+        """get the time to answer the current question
+
+        Returns:
+            int: the time to answer the question
+        """
+        return self.questions_controller.get_current_question().time_to_answer
+
+    def __question_timeout_manage_lights(self, reading_until: int, sleep_time: int):
+        """manage the lights when a question times out
+
+        Args:
+            starting_time (int): the time the question started
+            tta (int): the time to answer the question
+        """
+
+        def question_timeout():
+            time.sleep(sleep_time-0.001)
+            if self.reading_until == reading_until:
+                self.controllers.turn_light_off([0, 1, 2, 3])
+
+        Thread(target=question_timeout, args=()).start()
+
     def set_answering(self):
-        """set the state as someone answering"""
+        """set the state as people can answer"""
         logging.debug("Waiting for answer")
         if self.state != States.SPLIT_OR_STEAL:
             self.state = States.ANSWERING_QUESTION
-            self.reading_until = time.time_ns() + TIME_TO_ANSWER
+            self.reading_until = time.time_ns() + self.__get_time_to_answer() * 1e9
+            self.__question_timeout_manage_lights(
+                self.reading_until, self.__get_time_to_answer()
+            )
         self.actions.play_start_accepting = True
         self.__set_reading(True)
 

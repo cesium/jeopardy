@@ -54,6 +54,7 @@ class Question:
         image: str,
         value: int,
         category: str,
+        time_to_answer: int,
         tie_breaker: bool = False,
     ):
         self.id: int = idx
@@ -64,6 +65,7 @@ class Question:
         self.category: str = category
         self.answered: bool = False
         self.tie_breaker: bool = tie_breaker
+        self.time_to_answer: int = time_to_answer
 
     def answer_incorreclty(self, team: Team):
         """action for playing answering incorrectly
@@ -101,4 +103,5 @@ class Question:
             "value": self.value,
             "category": self.category,
             "answered": self.answered,
+            "tta": self.time_to_answer,
         }
