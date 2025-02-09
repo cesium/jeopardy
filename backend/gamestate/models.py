@@ -64,8 +64,8 @@ class Question:
         self.value: int = value
         self.category: str = category
         self.answered: bool = False
-        self.tie_breaker: bool = tie_breaker
         self.time_to_answer: int = time_to_answer
+        self.tie_breaker: bool = tie_breaker
 
     def answer_incorreclty(self, team: Team):
         """action for playing answering incorrectly

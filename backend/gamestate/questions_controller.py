@@ -73,7 +73,7 @@ class QuestionsController:
                         100,
                         "Tiebreak",
                         120,
-                        True,
+                        tie_breaker=True,
                     )
                 )
                 idx += 1
@@ -132,7 +132,7 @@ class QuestionsController:
         """
         Skips the current question
         """
-        self.questions[self.current_question_idx].skip()
+        self.get_current_question().skip()
 
     def tiebreak(self):
         """
@@ -151,7 +151,7 @@ class QuestionsController:
         Args:
             team (Team): team that answered the question
         """
-        self.questions[self.current_question_idx].answer_correctly(team)
+        self.get_current_question().answer_correctly(team)
 
     def __answer_incorreclty(self, team: Team):
         """action for a team answering a question incorrectly
@@ -159,7 +159,7 @@ class QuestionsController:
         Args:
             team (Team): team that answered the question
         """
-        self.questions[self.current_question_idx].answer_incorreclty(team)
+        self.get_current_question().answer_incorreclty(team)
 
     def answer(self, team: Team, correct: bool):
         """action for answering a question

@@ -15,6 +15,7 @@ class Actions:
         self.stop_countdown: bool = False
         self.play_end_sound: bool = False
         self.show_sos: bool = False
+        self.show_tiebreaker: bool = False
         self.play_theme_song: bool = True
         self.play_question_selection_sound: bool = False
 
@@ -50,4 +51,5 @@ class Actions:
             "playQuestionSelectionSound": self.play_question_selection_sound,
             "stopTimer": self.stop_countdown,
             "showSOS": self.show_sos,
+            "showTiebreaker": self.show_tiebreaker,
         }

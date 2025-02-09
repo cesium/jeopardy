@@ -100,7 +100,7 @@ class GameState:
         self.teams_controller.set_teams(teams_names)
         self.state = States.SELECTING_QUESTION
 
-    def set_current_team(self, team_idx: int):
+    def __set_current_team(self, team_idx: int):
         """set a new team as playing
 
         Args:
@@ -134,6 +134,10 @@ class GameState:
             # stealers = [i for i, k in self.sos_steal.items() if k]
             # self.teams_controller.split_or_steal(stealers)
 
+    def show_tiebreaker(self):
+        """show the tiebreaker question"""
+        self.actions.show_tiebreaker = True
+
     def end_game(self):
         """end the game"""
         if self.state == States.SPLIT_OR_STEAL and self.actions.show_sos:
@@ -152,7 +156,7 @@ class GameState:
                     if self.timeouts[controller] >= time.time_ns():
                         logging.info("TIMEOUT")
                     else:
-                        self.set_current_team(controller)
+                        self.__set_current_team(controller)
                 else:
                     logging.info("OUT OF TIME")
             else:
@@ -253,7 +257,7 @@ class GameState:
         """
 
         def question_timeout():
-            time.sleep(sleep_time-0.001)
+            time.sleep(sleep_time - 0.001)
             if self.reading_until == reading_until:
                 self.controllers.turn_light_off([0, 1, 2, 3])
 
