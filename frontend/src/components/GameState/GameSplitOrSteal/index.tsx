@@ -170,7 +170,7 @@ export default function GameSplitOrSteal({
                 {state.SOSAnswers.filter((r) => r).length === 1 && (
                   <p>
                     {winningTeam().names.find(
-                      (_, idx) => state.SOSAnswers[idx]
+                      (_, idx) => state.SOSAnswers[idx],
                     )}
                   </p>
                 )}

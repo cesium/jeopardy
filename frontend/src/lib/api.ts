@@ -115,7 +115,7 @@ export async function fixListSaves() {
 }
 
 export async function fixSaves(save: string) {
-  const response = await API.post("/fix/saves/",{
+  const response = await API.post("/fix/saves/", {
     name: save,
   });
   return response.data;

@@ -3,7 +3,6 @@
 import { useState } from "react";
 import * as api from "../../../lib/api";
 
-
 function PlayerInput({ onChange }) {
   return (
     <div className="my-8">
@@ -17,12 +16,12 @@ function PlayerInput({ onChange }) {
   );
 }
 
-export default function Points()  {
+export default function Points() {
   const [team, setTeam] = useState<number>();
   const [points, setPoints] = useState<number>();
 
   const submit = () => {
-    api.fixPoints(team,points);
+    api.fixPoints(team, points);
   };
 
   const updateTeam = (n: number) => {
@@ -31,8 +30,6 @@ export default function Points()  {
   const updatePoints = (n: number) => {
     setPoints(n);
   };
-
-  
 
   return (
     <div className="flex h-screen w-screen items-center justify-center text-white">

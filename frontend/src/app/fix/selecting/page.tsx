@@ -3,7 +3,6 @@
 import { useState } from "react";
 import * as api from "../../../lib/api";
 
-
 function PlayerInput({ onChange }) {
   return (
     <div className="my-8">
@@ -27,8 +26,6 @@ export default function Selecting() {
   const updateTeam = (n: number) => {
     setTeam(n);
   };
-
-  
 
   return (
     <div className="flex h-screen w-screen items-center justify-center text-white">

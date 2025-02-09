@@ -78,8 +78,10 @@ export default function GameOver({ state, role, inView }: GameOverProps) {
                       ? 0
                       : state.SOSAnswers[idx]
                         ? winningTeam().balance
-                        : Math.round(winningTeam().balance / 2),
-                    0
+                        : state.SOSAnswers.some((a) => a)
+                          ? 0
+                          : Math.round(winningTeam().balance / 2),
+                    0,
                   )}{" "}
                   TOKENS
                 </p>

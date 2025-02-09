@@ -10,14 +10,14 @@ interface GameAnsweringQuestionProps {
   inView: boolean;
 }
 
-function CountdownTimer({ initialSeconds, refreshRate, endSound, role }) {
+function CountdownTimer({ initialSeconds, refreshRate, role }) {
   const [seconds, setSeconds] = useState(initialSeconds);
   const [playEndSound] = useSound("/sounds/wrong.mp3", { interrupt: true });
 
   useEffect(() => setSeconds(initialSeconds), [initialSeconds]);
 
   useEffect(() => {
-    if (seconds <= 0 && endSound && role === "viewer") {
+    if (seconds <= 0 && role === "viewer") {
       playEndSound();
       return;
     }
@@ -29,13 +29,13 @@ function CountdownTimer({ initialSeconds, refreshRate, endSound, role }) {
 
     // Clean up the timer
     return () => clearInterval(timer);
-  }, [seconds, refreshRate, endSound, playEndSound, role]);
+  }, [seconds, refreshRate, playEndSound, role]);
 
   const percentage = (seconds / initialSeconds) * 100;
 
   return (
     <div
-      className={`fixed top-0 h-8 transition-colors ${percentage >= 50 ? "bg-green-700" : percentage >= 20 ? "bg-amber-300" : "bg-red-700"}`}
+      className={`fixed top-0 h-8 transition-colors ${percentage >= 50 ? "bg-accent" : percentage >= 20 ? "bg-amber-300" : "bg-red-700"}`}
       style={{ width: percentage + "vw" }}
     ></div>
   );
@@ -47,9 +47,9 @@ export default function GameAnsweringQuestion({
   fadeOut,
   inView,
 }: GameAnsweringQuestionProps) {
-  const [playTimerSound, { stop }] = useSound("/sounds/timer.mp3", {
+  const [playTimerSound, { stop: timerStop }] = useSound("/sounds/timer.mp3", {
     interrupt: true,
-    volume: 2,
+    volume: 0.5,
   });
   const [playBuzzSound] = useSound("/sounds/buzz.mp3", {
     interrupt: true,
@@ -57,17 +57,22 @@ export default function GameAnsweringQuestion({
   });
   const [playCorrectSound] = useSound("/sounds/correct.mp3", {
     interrupt: true,
-    volume: 2,
+    volume: 1,
   });
   const [playWrongSound] = useSound("/sounds/wrong.mp3", {
     interrupt: true,
-    volume: 2,
+    volume: 1,
   });
   const [playStart] = useSound("/sounds/start.mp3", {
     interrupt: true,
     volume: 2,
   });
+  const [playTension, { stop: tensionStop }] = useSound("/sounds/tension.mp3", {
+    interrupt: true,
+    volume: 0.5,
+  });
   const [started, setStarted] = useState<boolean>(false);
+  const [timerEnded, setTimerEnded] = useState<boolean>(false);
 
   const timer = useCallback(() => {
     if (state.state === 4) {
@@ -78,7 +83,6 @@ export default function GameAnsweringQuestion({
       const maxTimer = 30;
       const currentValue = state.currentQuestion.value;
       const percentage = (currentValue - minValue) / (maxValue - minValue);
-      console.log(minTimer + percentage * (maxTimer - minTimer));
       return minTimer + percentage * (maxTimer - minTimer);
     }
     return 10;
@@ -94,15 +98,32 @@ export default function GameAnsweringQuestion({
       }
       if (state.actions.playStartAccepting) {
         playStart();
+        playTension();
+        setTimeout(() => tensionStop(), timer() * 1000 + 1000);
       }
       if (state.actions.playBuzzerSound) {
+        tensionStop();
         playBuzzSound();
-        setTimeout(() => playTimerSound(), 500);
-        setTimeout(() => stop(), timer());
+        playTimerSound();
+        setTimeout(
+          () => {
+            timerStop();
+          },
+          timer() * 1000 + 1000,
+        );
       }
-      if (state.actions.stopTimer) {
-        stop();
+      if (state.actions.stopTimer || state.state !== 4) {
+        timerStop();
       }
+      if (state.state !== 3) {
+        tensionStop();
+      }
+    }
+    if (state.actions.playBuzzerSound) {
+      setTimerEnded(false);
+      setTimeout(() => {
+        setTimerEnded(true);
+      }, timer() * 1000);
     }
   }, [
     state,
@@ -111,16 +132,20 @@ export default function GameAnsweringQuestion({
     playStart,
     playBuzzSound,
     playTimerSound,
-    stop,
+    timerStop,
     role,
     timer,
+    playTension,
+    tensionStop,
   ]);
 
   const startQuestion = () => {
     api.startQuestion().then(() => setStarted(true));
   };
   const skipQuestion = () => {
-    api.skipQuestion().then(() => setTimeout(() => setStarted(false), 1000));
+    api.skipQuestion().then(() => {
+      setTimeout(() => setStarted(false), 1000);
+    });
   };
   const submit = async (res) => {
     api.answer(res).then(() => setStarted(false));
@@ -142,7 +167,6 @@ export default function GameAnsweringQuestion({
               role={role}
               initialSeconds={timer()}
               refreshRate={60}
-              endSound={state.state === 3 ? true : !stopTimer}
             />
           )}
         <div className="my-24 text-center">
@@ -197,6 +221,7 @@ export default function GameAnsweringQuestion({
                 </div>
               </>
             ) : (
+              !timerEnded &&
               state.state === 4 && (
                 <div className="w-3/4 mt-12 m-auto">
                   <button

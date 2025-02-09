@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { State } from "../../../types";
 import { processState } from "../../../lib/utils";
 import * as api from "../../../lib/api";
+import useSound from "use-sound";
 
 interface GameSelectingQuestionProps {
   state: State;
@@ -83,6 +84,17 @@ export default function GameSelectingQuestion({
   useEffect(() => {
     getPosition(animationPosition);
   }, [animationPosition, getPosition]);
+
+  useEffect(() => {
+    if (role === "viewer" && state.actions.playQuestionSelectionSound) {
+      playOpenQuestion();
+    }
+  }, [state.actions]);
+
+  const [playOpenQuestion] = useSound("/sounds/swoosh-zoom-in.mp3", {
+    volume: 1,
+    interrupt: true,
+  });
 
   const setQuestion = (id) => {
     api.setQuestion(id);

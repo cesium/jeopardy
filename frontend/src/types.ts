@@ -31,5 +31,6 @@ export type State = {
     stopTimer: boolean;
     showSOS: boolean;
     playThemeSong: boolean;
+    playQuestionSelectionSound: boolean;
   };
 };

@@ -31,6 +31,102 @@
                 "image": "",
                 "value": 500
             }
+        ],
+        "BD": [
+            {
+                "question": "Qual é a linguagem de consulta estruturada para banco de dados?",
+                "answer": "SQL",
+                "image": "",
+                "value": 100
+            },
+            {
+                "question": "Qual é a linguagem de consulta estruturada para banco de dados?",
+                "answer": "SQL",
+                "image": "",
+                "value": 200
+            },
+            {
+                "question": "Qual é a linguagem de consulta estruturada para banco de dados?",
+                "answer": "SQL",
+                "image": "",
+                "value": 300
+            },
+            {
+                "question": "Qual é a linguagem de consulta estruturada para banco de dados?",
+                "answer": "SQL",
+                "image": "",
+                "value": 400
+            },
+            {
+                "question": "Qual é a linguagem de consulta estruturada para banco de dados?",
+                "answer": "SQL",
+                "image": "",
+                "value": 500
+            }
+        ],
+        "Frontend": [
+            {
+                "question": "Qual é a linguagem de marcação utilizada para estruturar páginas web?",
+                "answer": "HTML",
+                "image": "",
+                "value": 100
+            },
+            {
+                "question": "Qual é a linguagem de marcação utilizada para estruturar páginas web?",
+                "answer": "HTML",
+                "image": "",
+                "value": 200
+            },
+            {
+                "question": "Qual é a linguagem de marcação utilizada para estruturar páginas web?",
+                "answer": "HTML",
+                "image": "",
+                "value": 300
+            },
+            {
+                "question": "Qual é a linguagem de marcação utilizada para estruturar páginas web?",
+                "answer": "HTML",
+                "image": "",
+                "value": 400
+            },
+            {
+                "question": "Qual é a linguagem de marcação utilizada para estruturar páginas web?",
+                "answer": "HTML",
+                "image": "",
+                "value": 500
+            }
+        ],
+        "Backend": [
+            {
+                "question": "Qual é a linguagem de programação utilizada para desenvolver aplicações web?",
+                "answer": "JavaScript",
+                "image": "",
+                "value": 100
+            },
+            {
+                "question": "Qual é a linguagem de programação utilizada para desenvolver aplicações web?",
+                "answer": "JavaScript",
+                "image": "",
+                "value": 200
+            },
+            {
+                "question": "Qual é a linguagem de programação utilizada para desenvolver aplicações web?",
+                "answer": "JavaScript",
+                "image": "",
+                "value": 300
+            },
+            {
+                "question": "Qual é a linguagem de programação utilizada para desenvolver aplicações web?",
+                "answer": "JavaScript",
+                "image": "",
+                "value": 400
+            },
+            {
+                "question": "Qual é a linguagem de programação utilizada para desenvolver aplicações web?",
+                "answer": "JavaScript",
+                "image": "",
+                "value": 500
+            }
         ]
     },
     "tiebreaker": [

@@ -3,8 +3,7 @@
 import { useState, useEffect } from "react";
 import * as api from "../../../lib/api";
 
-
-export default function Saves()  {
+export default function Saves() {
   const [save, setSave] = useState<string>();
   const [options, setOptions] = useState<string[]>([]);
   const [submitTrigger, setSubmitTrigger] = useState<boolean>(false);
@@ -33,14 +32,15 @@ export default function Saves()  {
         <h1 className="text-center uppercase text-5xl font-bold mb-8">
           Update Save
         </h1>
-        <select 
+        <select
           className="py-4 w-full m-auto mt-8 bg-yellow-700 uppercase text-xl"
-          onChange={(e) => updateSave(e.target.value)}>
-            {options.map((option, index) => (
-              <option key={index} value={option}>
-                {option}
-              </option>
-            ))}
+          onChange={(e) => updateSave(e.target.value)}
+        >
+          {options.map((option, index) => (
+            <option key={index} value={option}>
+              {option}
+            </option>
+          ))}
         </select>
         <button
           className="py-4 w-full m-auto mt-8 bg-green-700 uppercase text-xl"
