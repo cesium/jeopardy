@@ -195,6 +195,7 @@ class GameState:
         logging.debug("SELECT QUESTION: %d", identifier)
         self.questions_controller.select_question(identifier)
         self.state = States.READING_QUESTION
+        self.actions.play_question_selection_sound = True
 
     def skip_question(self):
         """skip the current question"""
