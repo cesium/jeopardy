@@ -2,6 +2,7 @@
 """Module responsable for storing the state of the game"""
 
 from enum import Enum
+from threading import Thread
 from typing import List
 import os
 import time
@@ -15,7 +16,6 @@ from .models import Team, Question
 
 SPLIT_OR_STEAL = bool(os.getenv("USE_SPLIT_OR_STEAL", "True"))
 BUZZ_PENALTY_TIMEOUT = int(os.getenv("BUZZ_PENALTY_TIMEOUT", "5")) * 1e9
-TIME_TO_ANSWER = int(os.getenv("TIME_TO_ANSWER", "20")) * 1e9
 
 
 class States(Enum):
@@ -99,8 +99,9 @@ class GameState:
             raise AssertionError("Cannot set teams mid game")
         self.teams_controller.set_teams(teams_names)
         self.state = States.SELECTING_QUESTION
+        self.actions.play_selecting_question_sound = True
 
-    def set_current_team(self, team_idx: int):
+    def __set_current_team(self, team_idx: int):
         """set a new team as playing
 
         Args:
@@ -134,6 +135,10 @@ class GameState:
             # stealers = [i for i, k in self.sos_steal.items() if k]
             # self.teams_controller.split_or_steal(stealers)
 
+    def show_tiebreaker(self):
+        """show the tiebreaker question"""
+        self.actions.show_tiebreaker = True
+
     def end_game(self):
         """end the game"""
         if self.state == States.SPLIT_OR_STEAL and self.actions.show_sos:
@@ -152,7 +157,9 @@ class GameState:
                     if self.timeouts[controller] >= time.time_ns():
                         logging.info("TIMEOUT")
                     else:
-                        self.set_current_team(controller)
+                        self.__set_current_team(controller)
+                else:
+                    logging.info("OUT OF TIME")
             else:
                 logging.info("NOT READING")
                 self.timeouts[controller] = time.time_ns() + BUZZ_PENALTY_TIMEOUT
@@ -213,6 +220,7 @@ class GameState:
                 self.__goto_end_game()
         else:
             self.state = States.SELECTING_QUESTION
+            self.actions.play_selecting_question_sound = True
         self.__set_reading(False)
         self.actions.reset_countdown_timer()
 
@@ -220,6 +228,7 @@ class GameState:
         t = self.teams_controller.get_winning_team()
         if len(t.names) > 1 and SPLIT_OR_STEAL:
             self.teams_controller.playing = list(range(len(t.names)))
+            self.controllers_used_in_current_question = []
             self.state = States.SPLIT_OR_STEAL
         else:
             self.__game_over()
@@ -234,12 +243,38 @@ class GameState:
         except requests_ConnectionError:
             logging.error("Failed to connect to buzz controllers")
 
+    def __get_time_to_answer(self) -> int:
+        """get the time to answer the current question
+
+        Returns:
+            int: the time to answer the question
+        """
+        return self.questions_controller.get_current_question().time_to_answer
+
+    def __question_timeout_manage_lights(self, reading_until: int, sleep_time: int):
+        """manage the lights when a question times out
+
+        Args:
+            starting_time (int): the time the question started
+            tta (int): the time to answer the question
+        """
+
+        def question_timeout():
+            time.sleep(sleep_time - 0.001)
+            if self.reading_until == reading_until:
+                self.controllers.turn_light_off([0, 1, 2, 3])
+
+        Thread(target=question_timeout, args=()).start()
+
     def set_answering(self):
-        """set the state as someone answering"""
+        """set the state as people can answer"""
         logging.debug("Waiting for answer")
         if self.state != States.SPLIT_OR_STEAL:
             self.state = States.ANSWERING_QUESTION
-            self.reading_until = time.time_ns() + TIME_TO_ANSWER
+            self.reading_until = time.time_ns() + self.__get_time_to_answer() * 1e9
+            self.__question_timeout_manage_lights(
+                self.reading_until, self.__get_time_to_answer()
+            )
         self.actions.play_start_accepting = True
         self.__set_reading(True)
 
@@ -265,18 +300,23 @@ class GameState:
             ):  # if all teams answered incorrectly
                 self.teams_controller.next_selecting()
 
-        if not correct and len(self.controllers_used_in_current_question) != 4:
+        if not correct and len(self.controllers_used_in_current_question) != len(
+            self.teams_controller.playing
+        ):  # not everyone answered
             self.state = States.READING_QUESTION
         else:
-            self.state = States.SELECTING_QUESTION
-            self.controllers_used_in_current_question = []
-
-        if self.questions_controller.questions_over():
-            if self.teams_controller.is_tie():
-                self.questions_controller.tiebreak()
-                self.state = States.READING_QUESTION
+            if self.questions_controller.questions_over():  # no more questions
+                first = not self.questions_controller.in_tiebreak
+                if self.teams_controller.is_tie():  # if there is still a tie
+                    if first or not correct:
+                        self.questions_controller.tiebreak()
+                    self.state = States.READING_QUESTION
+                    self.controllers_used_in_current_question = []
+                else:
+                    self.__goto_end_game()
             else:
-                self.__goto_end_game()
+                self.skip_question()
+
         self.__set_reading(False)
         self.actions.reset_countdown_timer()
 
