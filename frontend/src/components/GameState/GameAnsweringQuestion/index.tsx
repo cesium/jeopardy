@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import useSound from "use-sound";
 import { State } from "../../../types";
 import * as api from "../../../lib/api";
+import Image from "next/image";
 
 interface GameAnsweringQuestionProps {
   state: State;
@@ -50,6 +51,7 @@ export default function GameAnsweringQuestion({
   const [playTimerSound, { stop: timerStop }] = useSound("/sounds/timer.mp3", {
     interrupt: true,
     volume: 0.5,
+    loop: true,
   });
   const [playBuzzSound] = useSound("/sounds/buzz.mp3", {
     interrupt: true,
@@ -73,19 +75,14 @@ export default function GameAnsweringQuestion({
   });
   const [started, setStarted] = useState<boolean>(false);
   const [timerEnded, setTimerEnded] = useState<boolean>(false);
+  const [showTiebreakQuestion, setShowTiebreakQuestion] =
+    useState<boolean>(false);
 
   const timer = useCallback(() => {
     if (state.state === 4) {
-      const values = new Set(state.questions.map((q) => q.value));
-      const minValue = Math.min(...values);
-      const maxValue = Math.max(...values);
-      const minTimer = 10;
-      const maxTimer = 30;
-      const currentValue = state.currentQuestion.value;
-      const percentage = (currentValue - minValue) / (maxValue - minValue);
-      return minTimer + percentage * (maxTimer - minTimer);
+      return state.currentQuestion.tta;
     }
-    return 10;
+    return 8;
   }, [state]);
 
   useEffect(() => {
@@ -99,18 +96,15 @@ export default function GameAnsweringQuestion({
       if (state.actions.playStartAccepting) {
         playStart();
         playTension();
-        setTimeout(() => tensionStop(), timer() * 1000 + 1000);
+        setTimeout(() => tensionStop(), timer() * 1000);
       }
       if (state.actions.playBuzzerSound) {
         tensionStop();
         playBuzzSound();
         playTimerSound();
-        setTimeout(
-          () => {
-            timerStop();
-          },
-          timer() * 1000 + 1000,
-        );
+        setTimeout(() => {
+          timerStop();
+        }, timer() * 1000);
       }
       if (state.actions.stopTimer || state.state !== 4) {
         timerStop();
@@ -139,6 +133,12 @@ export default function GameAnsweringQuestion({
     tensionStop,
   ]);
 
+  useEffect(() => {
+    if (state.actions.showTiebreakQuestion) {
+      setShowTiebreakQuestion(true);
+    }
+  }, [state.actions.showTiebreakQuestion]);
+
   const startQuestion = () => {
     api.startQuestion().then(() => setStarted(true));
   };
@@ -153,6 +153,12 @@ export default function GameAnsweringQuestion({
   const stopTimer = async () => {
     api.stopTimer();
   };
+  const handleShowTiebreakQuestion = async () => {
+    api.showTiebreakQuestion().then(() => setShowTiebreakQuestion(true));
+  };
+
+  const isTiebreak =
+    state.currentQuestion.category.toLowerCase() === "tiebreak";
 
   return (
     <div
@@ -161,122 +167,142 @@ export default function GameAnsweringQuestion({
       <div
         className={`${inView ? "opacity-100" : "opacity-0"} transition-all duration-500 w-full h-full flex flex-col items-center justify-center`}
       >
-        {(state.state === 3 || state.state === 4) &&
-          !state.actions.stopTimer && (
-            <CountdownTimer
-              role={role}
-              initialSeconds={timer()}
-              refreshRate={60}
-            />
-          )}
-        <div className="my-24 text-center">
-          <p className="font-extrabold text-3xl uppercase">
-            {state.currentQuestion.category}
-          </p>
-          <p className="font-bold text-3xl mt-2 text-primary">
-            {state.currentQuestion.value}
-          </p>
-        </div>
-        <div className="uppercase grow items-center flex flex-col font-extrabold w-[80vw] text-center space-y-16">
-          {state.currentQuestion.image &&
-            state.currentQuestion.image !== "" && (
-              <img
-                src={`/images/questions/${state.currentQuestion.image}`}
-                alt="Question Image"
-                className={`${role === "staff" ? "h-[16rem]" : "h-[26rem]"} rounded-xl`}
-              />
-            )}
-          <p
-            className={`w-fit m-auto ${state.currentQuestion.image !== "" ? "text-4xl" : "text-6xl"}`}
-          >
-            {state.currentQuestion.statement}
-          </p>
-        </div>
-        {role !== "viewer" && (
-          <div className="uppercase font-extrabold text-2xl text-primary w-full text-center pt-10">
-            <u>RESPOSTA:</u> {state.currentQuestion.answer}
-          </div>
-        )}
-        {role === "staff" && started && (
+        {isTiebreak && !showTiebreakQuestion ? (
           <>
-            {state.actions.stopTimer ? (
+            <h1 className="text-[14rem]">Tiebreak</h1>
+            {role === "staff" && (
+              <button
+                className="w-96 bg-accent uppercase text-4xl p-2 rounded-sm"
+                onClick={() => handleShowTiebreakQuestion()}
+              >
+                show question
+              </button>
+            )}
+          </>
+        ) : (
+          <div
+            className={`w-full h-full flex flex-col items-center justify-center transition-opacity duration-500 ${!isTiebreak || showTiebreakQuestion ? "opacity-100" : "opacity-0"}`}
+          >
+            {(state.state === 3 || state.state === 4) &&
+              !state.actions.stopTimer && (
+                <CountdownTimer
+                  role={role}
+                  initialSeconds={timer()}
+                  refreshRate={60}
+                />
+              )}
+            <div className="my-24 text-center">
+              <p className="font-extrabold text-3xl uppercase">
+                {state.currentQuestion.category}
+              </p>
+              <p className="font-bold text-3xl mt-2 text-primary">
+                {state.currentQuestion.value}
+              </p>
+            </div>
+            <div className="uppercase grow items-center flex flex-col font-extrabold w-[80vw] text-center space-y-16">
+              {state.currentQuestion.image &&
+                state.currentQuestion.image !== "" && (
+                  <Image
+                    width={500}
+                    height={500}
+                    src={`/images/questions/${state.currentQuestion.image}`}
+                    alt="Question Image"
+                    className={`${role === "staff" ? "h-[16rem]" : "h-[26rem]"} rounded-xl`}
+                  />
+                )}
+              <p
+                className={`w-fit m-auto ${state.currentQuestion.image !== "" ? "text-4xl" : "text-6xl"}`}
+              >
+                {state.currentQuestion.statement}
+              </p>
+            </div>
+            {role !== "viewer" && (
+              <div className="uppercase font-extrabold text-2xl text-primary w-full text-center pt-10">
+                <u>RESPOSTA:</u> {state.currentQuestion.answer}
+              </div>
+            )}
+            {role === "staff" && started && (
               <>
-                <div className="w-3/4 grid grid-cols-2 gap-4 mt-12 m-auto">
+                {state.actions.stopTimer ? (
+                  <>
+                    <div className="w-3/4 grid grid-cols-2 gap-4 mt-12 m-auto">
+                      <button
+                        className="w-full bg-red-700 py-2 text-4xl rounded-sm"
+                        onClick={() => {
+                          submit(false);
+                        }}
+                      >
+                        Errado
+                      </button>
+                      <button
+                        className="w-full bg-green-700 py-2 text-4xl rounded-sm"
+                        onClick={() => {
+                          submit(true);
+                        }}
+                      >
+                        Certo
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  !timerEnded &&
+                  state.state === 4 && (
+                    <div className="w-3/4 mt-12 m-auto">
+                      <button
+                        className="w-full bg-accent py-2 text-4xl rounded-sm"
+                        onClick={() => {
+                          stopTimer();
+                        }}
+                      >
+                        Respondeu
+                      </button>
+                    </div>
+                  )
+                )}
+                <div className="w-full flex justify-center items-center">
                   <button
-                    className="w-full bg-red-700 py-2 text-4xl rounded-sm"
+                    className="w-3/4 bg-amber-700 py-2 text-4xl mt-4 rounded-sm"
                     onClick={() => {
-                      submit(false);
+                      skipQuestion();
                     }}
                   >
-                    Errado
-                  </button>
-                  <button
-                    className="w-full bg-green-700 py-2 text-4xl rounded-sm"
-                    onClick={() => {
-                      submit(true);
-                    }}
-                  >
-                    Certo
+                    Skip
                   </button>
                 </div>
               </>
-            ) : (
-              !timerEnded &&
-              state.state === 4 && (
-                <div className="w-3/4 mt-12 m-auto">
-                  <button
-                    className="w-full bg-accent py-2 text-4xl rounded-sm"
-                    onClick={() => {
-                      stopTimer();
-                    }}
-                  >
-                    Respondeu
-                  </button>
-                </div>
-              )
             )}
-            <div className="w-full flex justify-center items-center">
-              <button
-                className="w-3/4 bg-amber-700 py-2 text-4xl mt-4 rounded-sm"
-                onClick={() => {
-                  skipQuestion();
-                }}
-              >
-                Skip
-              </button>
+            {role == "staff" && !started && (
+              <div className="w-full flex content-center">
+                <button
+                  className="w-1/2 m-auto mt-12 bg-yellow-700 py-2 text-4xl rounded-sm"
+                  onClick={() => startQuestion()}
+                >
+                  Aceitar Buzz
+                </button>
+              </div>
+            )}
+            <div className="flex items-center justify-center my-24 text-center uppercase">
+              {state.teams.map((p, idx) => (
+                <div
+                  key={`team-${idx}`}
+                  className={`mx-12 ${state.state == 4 && state.currentTeam === idx ? "text-primary" : ""}`}
+                >
+                  <div className="flex flex-col space-y-0.5">
+                    {p.names.map((name, index) => (
+                      <p
+                        key={index}
+                        className={`font-extrabold text-4xl ${state.state === 4 && state.currentTeam === idx && "text-primary animate-bounce"}`}
+                      >
+                        {name}
+                      </p>
+                    ))}
+                  </div>
+                  <p className="font-bold text-3xl mt-2">{p.balance}</p>
+                </div>
+              ))}
             </div>
-          </>
-        )}
-        {role == "staff" && !started && (
-          <div className="w-full flex content-center">
-            <button
-              className="w-1/2 m-auto mt-12 bg-yellow-700 py-2 text-4xl rounded-sm"
-              onClick={() => startQuestion()}
-            >
-              Aceitar Buzz
-            </button>
           </div>
         )}
-        <div className="flex items-center justify-center my-24 text-center uppercase">
-          {state.teams.map((p, idx) => (
-            <div
-              key={`team-${idx}`}
-              className={`mx-12 ${state.state == 4 && state.currentTeam === idx ? "text-primary" : ""}`}
-            >
-              <div className="flex flex-col space-y-0.5">
-                {p.names.map((name, index) => (
-                  <p
-                    key={index}
-                    className={`font-extrabold text-4xl ${state.state === 4 && state.currentTeam === idx && "text-primary animate-bounce"}`}
-                  >
-                    {name}
-                  </p>
-                ))}
-              </div>
-              <p className="font-bold text-3xl mt-2">{p.balance}</p>
-            </div>
-          ))}
-        </div>
       </div>
     </div>
   );

@@ -85,16 +85,39 @@ export default function GameSelectingQuestion({
     getPosition(animationPosition);
   }, [animationPosition, getPosition]);
 
-  useEffect(() => {
-    if (role === "viewer" && state.actions.playQuestionSelectionSound) {
-      playOpenQuestion();
-    }
-  }, [state.actions]);
-
   const [playOpenQuestion] = useSound("/sounds/swoosh-zoom-in.mp3", {
     volume: 1,
     interrupt: true,
   });
+  const [playBackgroundThemeSong, { stop }] = useSound(
+    "/sounds/themesong.mp3",
+    {
+      volume: 0.5,
+      loop: true,
+      interrupt: true,
+    },
+  );
+
+  useEffect(() => {
+    if (role === "viewer") {
+      if (state.actions.playQuestionSelectionSound) {
+        playOpenQuestion();
+      }
+      if (state.actions.playSelectingQuestionSound) {
+        playBackgroundThemeSong();
+      }
+      if (state.state !== 1) {
+        stop();
+      }
+    }
+  }, [
+    role,
+    state.actions,
+    playOpenQuestion,
+    playBackgroundThemeSong,
+    state.state,
+    stop,
+  ]);
 
   const setQuestion = (id) => {
     api.setQuestion(id);

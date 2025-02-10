@@ -11,6 +11,7 @@ export type Question = {
   value: number;
   category: string;
   answered: boolean;
+  tta: number; // seconds
 };
 
 export type State = {
@@ -30,7 +31,9 @@ export type State = {
     playEndSound: boolean;
     stopTimer: boolean;
     showSOS: boolean;
+    showTiebreakQuestion: boolean;
     playThemeSong: boolean;
     playQuestionSelectionSound: boolean;
+    playSelectingQuestionSound: boolean;
   };
 };

@@ -79,6 +79,11 @@ export async function showSOSResults() {
   return response.data;
 }
 
+export async function showTiebreakQuestion() {
+  const response = await API.post("/show_tiebreaker_question");
+  return response.data;
+}
+
 export async function endGame() {
   const response = await API.post("/end");
   return response.data;
