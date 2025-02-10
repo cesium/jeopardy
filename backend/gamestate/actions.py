@@ -18,6 +18,7 @@ class Actions:
         self.show_tiebreaker: bool = False
         self.play_theme_song: bool = True
         self.play_question_selection_sound: bool = False
+        self.play_selecting_question_sound: bool = False
 
     def reset_sound(self):
         """
@@ -30,6 +31,7 @@ class Actions:
         self.play_end_sound = False
         self.play_theme_song = False
         self.play_question_selection_sound = False
+        self.play_selecting_question_sound = False
 
     def reset_countdown_timer(self):
         """reset the countdown timer"""
@@ -49,6 +51,7 @@ class Actions:
             "playEndSound": self.play_end_sound,
             "playThemeSong": self.play_theme_song,
             "playQuestionSelectionSound": self.play_question_selection_sound,
+            "playSelectingQuestionSound": self.play_selecting_question_sound,
             "stopTimer": self.stop_countdown,
             "showSOS": self.show_sos,
             "showTiebreaker": self.show_tiebreaker,

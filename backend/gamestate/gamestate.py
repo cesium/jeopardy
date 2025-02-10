@@ -99,6 +99,7 @@ class GameState:
             raise AssertionError("Cannot set teams mid game")
         self.teams_controller.set_teams(teams_names)
         self.state = States.SELECTING_QUESTION
+        self.actions.play_selecting_question_sound = True
 
     def __set_current_team(self, team_idx: int):
         """set a new team as playing
@@ -219,6 +220,7 @@ class GameState:
                 self.__goto_end_game()
         else:
             self.state = States.SELECTING_QUESTION
+            self.actions.play_selecting_question_sound = True
         self.__set_reading(False)
         self.actions.reset_countdown_timer()
 
