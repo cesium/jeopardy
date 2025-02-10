@@ -305,6 +305,17 @@ def post_show_sos() -> dict:
     return {"status": "success"}
 
 
+@app.post("/show_tiebreaker", response_model=BasicResponse)
+def post_show_tiebreaker() -> dict:
+    """show tiebreaker
+
+    Returns:
+        dict: JSON response
+    """
+    app.my_state.show_tiebreaker()
+    return {"status": "success"}
+
+
 @app.post("/end", response_model=BasicResponse)
 def post_end() -> dict:
     """end the game

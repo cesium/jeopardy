@@ -297,18 +297,23 @@ class GameState:
             ):  # if all teams answered incorrectly
                 self.teams_controller.next_selecting()
 
-        if not correct and len(self.controllers_used_in_current_question) != 4:
+        if not correct and len(self.controllers_used_in_current_question) != len(
+            self.teams_controller.playing
+        ):  # not everyone answered
             self.state = States.READING_QUESTION
         else:
-            self.state = States.SELECTING_QUESTION
-            self.controllers_used_in_current_question = []
-
-        if self.questions_controller.questions_over():
-            if self.teams_controller.is_tie():
-                self.questions_controller.tiebreak()
-                self.state = States.READING_QUESTION
+            if self.questions_controller.questions_over():  # no more questions
+                first = not self.questions_controller.in_tiebreak
+                if self.teams_controller.is_tie():  # if there is still a tie
+                    if first or not correct:
+                        self.questions_controller.tiebreak()
+                    self.state = States.READING_QUESTION
+                    self.controllers_used_in_current_question = []
+                else:
+                    self.__goto_end_game()
             else:
-                self.__goto_end_game()
+                self.skip_question()
+
         self.__set_reading(False)
         self.actions.reset_countdown_timer()
 
