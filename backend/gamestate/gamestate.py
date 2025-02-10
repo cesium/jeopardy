@@ -226,6 +226,7 @@ class GameState:
         t = self.teams_controller.get_winning_team()
         if len(t.names) > 1 and SPLIT_OR_STEAL:
             self.teams_controller.playing = list(range(len(t.names)))
+            self.controllers_used_in_current_question = []
             self.state = States.SPLIT_OR_STEAL
         else:
             self.__game_over()
