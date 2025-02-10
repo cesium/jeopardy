@@ -283,6 +283,17 @@ def post_buzz_start() -> dict:
     return {"status": "success"}
 
 
+@app.post("/show_tiebreaker_question", response_model=BasicResponse)
+def post_show_tiebreaker_question() -> dict:
+    """show tiebreaker
+
+    Returns:
+        dict: JSON response
+    """
+    app.my_state.show_tiebreaker_question()
+    return {"status": "success"}
+
+
 @app.post("/stop_timer", response_model=BasicResponse)
 def post_stop_timer() -> dict:
     """stop accepting buzz inputs
