@@ -20,6 +20,7 @@ class Actions:
         self.play_question_selection_sound: bool = False
         self.play_selecting_question_sound: bool = False
         self.show_tiebreaker_question: bool = False
+        self.play_walk_in_song: bool = False
 
     def reset_sound(self):
         """
@@ -54,6 +55,7 @@ class Actions:
             "playThemeSong": self.play_theme_song,
             "playQuestionSelectionSound": self.play_question_selection_sound,
             "playSelectingQuestionSound": self.play_selecting_question_sound,
+            "playWalkInSong": self.play_walk_in_song,
             "stopTimer": self.stop_countdown,
             "showSOS": self.show_sos,
             "showTiebreaker": self.show_tiebreaker,

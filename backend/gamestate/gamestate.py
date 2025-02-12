@@ -382,6 +382,14 @@ class GameState:
             - set(self.controllers_used_in_current_question)
         )
 
+    def change_walkin(self, status: bool):
+        """change walk in song status
+
+        Args:
+            status (bool): the status to change to
+        """
+        self.actions.play_walk_in_song = status
+
     def __team_already_answered(self, team_id: int) -> bool:
         """check if team already answered
 
