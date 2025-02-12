@@ -92,7 +92,7 @@ export default function GameSelectingQuestion({
   const [playBackgroundThemeSong, { stop }] = useSound(
     "/sounds/themesong.mp3",
     {
-      volume: 0.5,
+      volume: 0.3,
       loop: true,
       interrupt: true,
     },
@@ -143,7 +143,7 @@ export default function GameSelectingQuestion({
       >
         {categories.map((c, idx) => (
           <div
-            className="bg-accent mb-1 py-3 text-4xl rounded-md"
+            className="bg-accent mb-1 py-3 px-2 text-3xl rounded-md flex justify-center items-center"
             key={`cat-${idx}`}
           >
             <p className="drop-shadow-md">{c}</p>

@@ -35,5 +35,6 @@ export type State = {
     playThemeSong: boolean;
     playQuestionSelectionSound: boolean;
     playSelectingQuestionSound: boolean;
+    playWalkInSong: boolean;
   };
 };

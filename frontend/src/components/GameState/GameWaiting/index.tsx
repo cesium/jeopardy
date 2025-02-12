@@ -26,15 +26,41 @@ function PlayerInput({ id, onChange }) {
 }
 
 function GameWaitingNonStaff({ state, role }: GameWaitingProps) {
-  const [playThemeSong, { stop }] = useSound("/sounds/themesong.mp3", {
-    loop: true,
-    volume: 0.5,
-  });
+  const [playThemeSong, { stop: stopThemeSong, pause: pauseThemeSong }] =
+    useSound("/sounds/themesong.mp3", {
+      loop: true,
+      volume: 0.5,
+      interrupt: true,
+    });
+  const [playWalkInSong, { stop: stopWalkInSong }] = useSound(
+    "/sounds/walkin.mp3",
+    {
+      volume: 1,
+      interrupt: true,
+    }
+  );
 
   useEffect(() => {
-    if (role === "viewer" && state.actions.playThemeSong) playThemeSong();
-    if (state.state !== 0) stop();
-  }, [state, playThemeSong, stop, role]);
+    if (role === "viewer") {
+      if (state.actions.playThemeSong) playThemeSong();
+      if (state.actions.playWalkInSong) {
+        pauseThemeSong();
+        playWalkInSong();
+      } else {
+        stopWalkInSong();
+        playThemeSong();
+      }
+    }
+    if (state.state !== 0) stopThemeSong();
+  }, [
+    state,
+    playThemeSong,
+    stopThemeSong,
+    role,
+    playWalkInSong,
+    stopWalkInSong,
+    pauseThemeSong,
+  ]);
 
   return (
     <div className="flex items-center h-screen justify-center text-white">
@@ -57,13 +83,18 @@ function GameWaitingStaff({ state }: GameWaitingProps) {
   };
 
   const submit = () => {
-    //TODO: Actual use a list of names
     api.setTeams(names.map((n) => n.split(";")));
+  };
+  const handlePlayWalkInSong = () => {
+    api.playWalkInSong();
+  };
+  const handleStopWalkInSong = () => {
+    api.stopWalkInSong();
   };
 
   return (
     <div className="flex h-screen w-screen items-center justify-center text-white">
-      <div className="block">
+      <div className="block space-y-4">
         <h1 className="text-center uppercase text-5xl font-bold mb-8">
           Selecionar Jogadores
         </h1>
@@ -76,6 +107,20 @@ function GameWaitingStaff({ state }: GameWaitingProps) {
         >
           Start
         </button>
+        <div className="flex flex-col gap-2 justify-center font-semibold">
+          <button
+            onClick={() => handlePlayWalkInSong()}
+            className="bg-accent p-1 w-full"
+          >
+            Play Walk In Song
+          </button>
+          <button
+            onClick={() => handleStopWalkInSong()}
+            className="bg-red-700 w-full p-1"
+          >
+            Stop Walk In Song
+          </button>
+        </div>
       </div>
     </div>
   );

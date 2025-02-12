@@ -84,6 +84,16 @@ export async function showTiebreakQuestion() {
   return response.data;
 }
 
+export async function playWalkInSong() {
+  const response = await API.post("/play_walkin");
+  return response.data;
+}
+
+export async function stopWalkInSong() {
+  const response = await API.post("/stop_walkin");
+  return response.data;
+}
+
 export async function endGame() {
   const response = await API.post("/end");
   return response.data;

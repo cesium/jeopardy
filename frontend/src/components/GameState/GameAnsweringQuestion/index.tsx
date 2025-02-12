@@ -50,7 +50,7 @@ export default function GameAnsweringQuestion({
 }: GameAnsweringQuestionProps) {
   const [playTimerSound, { stop: timerStop }] = useSound("/sounds/timer.mp3", {
     interrupt: true,
-    volume: 0.5,
+    volume: 0.3,
     loop: true,
   });
   const [playBuzzSound] = useSound("/sounds/buzz.mp3", {
@@ -59,11 +59,11 @@ export default function GameAnsweringQuestion({
   });
   const [playCorrectSound] = useSound("/sounds/correct.mp3", {
     interrupt: true,
-    volume: 1,
+    volume: 1.5,
   });
   const [playWrongSound] = useSound("/sounds/wrong.mp3", {
     interrupt: true,
-    volume: 1,
+    volume: 1.5,
   });
   const [playStart] = useSound("/sounds/start.mp3", {
     interrupt: true,
@@ -71,7 +71,7 @@ export default function GameAnsweringQuestion({
   });
   const [playTension, { stop: tensionStop }] = useSound("/sounds/tension.mp3", {
     interrupt: true,
-    volume: 0.5,
+    volume: 0.3,
   });
   const [started, setStarted] = useState<boolean>(false);
   const [timerEnded, setTimerEnded] = useState<boolean>(false);
