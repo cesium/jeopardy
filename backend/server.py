@@ -338,6 +338,28 @@ def post_end() -> dict:
     return {"status": "success"}
 
 
+@app.post("/play_walkin", response_model=BasicResponse)
+def post_play_walkin() -> dict:
+    """play walkin song
+
+    Returns:
+        dict: JSON response
+    """
+    app.my_state.change_walkin(True)
+    return {"status": "success"}
+
+
+@app.post("/stop_walkin", response_model=BasicResponse)
+def post_stop_walkin() -> dict:
+    """stop walkin song
+
+    Returns:
+        dict: JSON response
+    """
+    app.my_state.change_walkin(False)
+    return {"status": "success"}
+
+
 class FixPoints(BaseModel):
     """JSON representation needing to alter a team's points"""
 
