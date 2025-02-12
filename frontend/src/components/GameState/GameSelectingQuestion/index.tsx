@@ -74,7 +74,8 @@ export default function GameSelectingQuestion({
       const row = Math.floor(cellNr / columnsNr);
       const column = cellNr % columnsNr;
       const left = 24 + column * cellWidth + column * 8;
-      const top = 24 + 64 + 12 + row * cellHeight + row * 8;
+      // CHANGE HERE: 132 is the height of the categories (currently occupy 3 lines of text)
+      const top = 24 + 132 + 12 + row * cellHeight + row * 8;
       setLeft(left);
       setTop(top);
     },
@@ -90,7 +91,7 @@ export default function GameSelectingQuestion({
     interrupt: true,
   });
   const [playBackgroundThemeSong, { stop }] = useSound(
-    "/sounds/themesong.mp3",
+    "/sounds/themesong-bg.mp3",
     {
       volume: 0.3,
       loop: true,

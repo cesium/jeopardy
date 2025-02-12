@@ -27,6 +27,30 @@ export default function GameSplitOrSteal({
     interrupt: true,
     volume: 2,
   });
+  const [playCountdownSound] = useSound("/sounds/countdown.mp3", {
+    interrupt: true,
+    volume: 1.5,
+  });
+  const [playSplitRevealSound] = useSound("/sounds/split.mp3", {
+    interrupt: true,
+    volume: 2,
+  });
+  const [playStealRevealSound] = useSound("/sounds/wrong.mp3", {
+    interrupt: true,
+    volume: 1.5,
+  });
+  const [playTension, { stop: stopTension }] = useSound("/sounds/tension.mp3", {
+    interrupt: true,
+    volume: 0.3,
+  });
+  const [playBackgroundThemeSong, { stop: stopBgSong }] = useSound(
+    "/sounds/themesong-bg.mp3",
+    {
+      loop: true,
+      volume: 0.3,
+      interrupt: true,
+    },
+  );
 
   const fight = () => {
     api.startQuestion().then(() => setStarted(true));
@@ -49,12 +73,24 @@ export default function GameSplitOrSteal({
     if (role === "viewer") {
       if (state.actions.playBuzzerSound) {
         playBuzzSound();
+        if (state.SOSAnswers.filter((a) => a !== null).length === 2)
+          stopTension();
       }
       if (state.actions.playStartAccepting) {
         playStart();
+        playTension();
       }
     }
-  }, [playBuzzSound, playStart, role, state.actions]);
+  }, [
+    playBuzzSound,
+    playStart,
+    playTension,
+    role,
+    state.SOSAnswers,
+    state.SOSAnswers.length,
+    state.actions,
+    stopTension,
+  ]);
 
   useEffect(() => {
     let active = true;
@@ -68,6 +104,7 @@ export default function GameSplitOrSteal({
       setTimeout(() => {
         setShowSOSResults(true);
         if (active) {
+          if (role === "viewer") playCountdownSound();
           setInterval(() => {
             if (countDown < 0) return;
             setCountDown((prev) => prev - 1);
@@ -76,13 +113,32 @@ export default function GameSplitOrSteal({
       }, 1000);
       setTimeout(() => {
         setFadeReveal(true);
+        if (active) {
+          if (role === "viewer") {
+            if (
+              state.SOSAnswers.every((r) => r) ||
+              state.SOSAnswers.filter((r) => r).length === 1
+            ) {
+              playStealRevealSound();
+            } else {
+              playSplitRevealSound();
+            }
+            playBackgroundThemeSong();
+          }
+        }
       }, 7000);
     }
 
     return () => {
       active = false;
     };
-  }, [state.actions, countDown]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.actions]);
+
+  useEffect(() => {
+    if (state.state !== 5) stopBgSong();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.state]);
 
   return (
     <div

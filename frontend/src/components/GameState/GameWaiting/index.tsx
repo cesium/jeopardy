@@ -37,7 +37,7 @@ function GameWaitingNonStaff({ state, role }: GameWaitingProps) {
     {
       volume: 1,
       interrupt: true,
-    }
+    },
   );
 
   useEffect(() => {

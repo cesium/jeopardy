@@ -199,7 +199,7 @@ export default function GameAnsweringQuestion({
                 {state.currentQuestion.value}
               </p>
             </div>
-            <div className="uppercase grow items-center flex flex-col font-extrabold w-[80vw] text-center space-y-16">
+            <div className="grow items-center flex flex-col font-semibold w-[80vw] text-center space-y-16">
               {state.currentQuestion.image &&
                 state.currentQuestion.image !== "" && (
                   <Image

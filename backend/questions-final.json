@@ -1,0 +1,228 @@
+{
+    "regular": {
+        "Algoritmos e Estruturas de Dados": [
+            {
+                "question": "Qual é a complexidade do algoritmo de procura binária no pior caso?",
+                "answer": "O(log n)",
+                "image": "",
+                "value": 100
+            },
+            {
+                "question": "Que estrutura de dados segue a regra 'First In, First Out' (FIFO)?",
+                "answer": "Fila (Queue)",
+                "image": "",
+                "value": 200
+            },
+            {
+                "question": "Que algoritmo de ordenação tem menor complexidade no pior caso entre QuickSort, MergeSort e BubbleSort?",
+                "answer": "MergeSort (O(n log n))",
+                "image": "",
+                "value": 300
+            },
+            {
+                "question": "Qual é a principal operação usada para balancear uma Árvore AVL?",
+                "answer": "Rotação/Rotation",
+                "image": "",
+                "value": 400
+            },
+            {
+                "question": "Que algoritmo é frequentemente usado para substituir sequências repetidas de caracteres numa curta representação?",
+                "answer": "Run-Length Encoding",
+                "image": "",
+                "value": 500
+            }
+        ],
+        "Segurança e Criptografia": [
+            {
+                "question": "Que mecanismo de segurança garante que uma senha armazenada não possa ser diretamente descoberta, apenas verificada?",
+                "answer": "Hashing",
+                "image": "",
+                "value": 100
+            },
+            {
+                "question": "O que é um 'keylogger'?",
+                "answer": "Programa que grava as teclas digitadas pelo usuário.",
+                "image": "",
+                "value": 200
+            },
+            {
+                "question": "Entre Força Bruta, Criptografia RSA e Criptografia Simétrica, qual não é uma forma de ataque criptográfico?",
+                "answer": "Criptografia RSA",
+                "image": "",
+                "value": 300
+            },
+            {
+                "question": "O que significa a sigla 'TLS'?",
+                "answer": "Transport Layer Security",
+                "image": "",
+                "value": 400
+            },
+            {
+                "question": "Qual é a estrutura de dados usada para implementar um algoritmo de Huffman?",
+                "answer": "Árvore binária",
+                "image": "",
+                "value": 500
+            }
+        ],
+        "Programação e Linguagens": [
+            {
+                "question": "Qual é o nome do processo de converter código-fonte em código executável?",
+                "answer": "Compilação",
+                "image": "",
+                "value": 100
+            },
+            {
+                "question": "Em Python, que palavra-chave é usada para definir uma função?",
+                "answer": "def",
+                "image": "",
+                "value": 200
+            },
+            {
+                "question": "Em JavaScript, que operador é usado para comparar valor e tipo ao mesmo tempo (igualdade estrita)?",
+                "answer": "===",
+                "image": "",
+                "value": 300
+            },
+            {
+                "question": "Em SQL, que comando é usado para remover todas as linhas de uma tabela sem remover a estrutura da tabela?",
+                "answer": "TRUNCATE",
+                "image": "",
+                "value": 400
+            },
+            {
+                "question": "Em linguagens de programação como Java e C++, qual é o nome do conceito que permite que o mesmo método possa receber um número diferente de argumentos?",
+                "answer": "Sobrecarga de métodos (Method Overloading)",
+                "image": "",
+                "value": 500
+            }
+        ],
+        "Personalidade": [
+            {
+                "question": "Conhecido como pai da computação moderna, como se chama o matemático e cientista responsável por quebrar o Enigma durante a Segunda Guerra Mundial?",
+                "answer": "Alan Turing",
+                "image": "",
+                "value": 100
+            },
+            {
+                "question": "Linus Torvalds é conhecido por ser o criador de qual das seguintes invenções?",
+                "answer": "Sistema Operativo Linux",
+                "image": "",
+                "value": 200
+            },
+            {
+                "question": "Como se chama a responsável pela criação do primeiro algoritmo destinado para uma máquina, sendo considerada a primeira programadora da história?",
+                "answer": "Ada Lovelace",
+                "image": "",
+                "value": 300
+            },
+            {
+                "question": "Qual das seguintes personalidades não é atualmente CEO de uma empresa de tecnologia de renome mundial? (A - Orson Ivor, B - Sundar Pichai, C - Jensen Huang, D - Satya Nadella)",
+                "answer": "A - Orson Ivor",
+                "image": "",
+                "value": 400
+            },
+            {
+                "question": "Quem foi o criador da linguagem de programação C?",
+                "answer": "Dennis Ritchie",
+                "image": "",
+                "value": 500
+            }
+        ],
+        "Siglas": [
+            {
+                "question": "O que significa a sigla VPN?",
+                "answer": "Virtual Private Network",
+                "image": "",
+                "value": 100
+            },
+            {
+                "question": "O que significa a sigla HTML?",
+                "answer": "HyperText Markup Language",
+                "image": "",
+                "value": 200
+            },
+            {
+                "question": "O que significa sigla CRUD?",
+                "answer": "Create, Read, Update, Delete",
+                "image": "",
+                "value": 300
+            },
+            {
+                "question": "O que significa a sigla USB?",
+                "answer": "Universal Serial Bus",
+                "image": "",
+                "value": 400
+            },
+            {
+                "question": "O que significa a sigla ACID, no contexto de bases de dados?",
+                "answer": "Atomicity, Consistency, Isolation, Durability",
+                "image": "",
+                "value": 500
+            }
+        ],
+        "Inteligência Artificial": [
+            {
+                "question": "Que nome se dá a um modelo de IA de grande escala, onde se enquadra o ChatGPT?",
+                "answer": "Large Language Model (LLM)",
+                "image": "",
+                "value": 100
+            },
+            {
+                "question": "Que tipo de modelos de IA aprendem através do ajuste dos seus parâmetros com base em dados de entrada e saída?",
+                "answer": "Modelos de Aprendizagem Supervisionada",
+                "image": "",
+                "value": 200
+            },
+            {
+                "question": "Qual o nome do teste proposto por um famoso matemático para avaliar se uma máquina pode exibir inteligência semelhante à humana?",
+                "answer": "Teste de Turing",
+                "image": "",
+                "value": 300
+            },
+            {
+                "question": "Como se designam modelos de IA que procuram encontrar soluções ótimas para problemas complexos baseando-se na evolução biológica?",
+                "answer": "Algoritmos Genéticos",
+                "image": "",
+                "value": 400
+            },
+            {
+                "question": "Em 1997, um supercomputador da IBM tornou-se famoso por derrotar Garry Kasparov no xadrez. Qual o seu nome?",
+                "answer": "Deep Blue",
+                "image": "",
+                "value": 500
+            }
+        ]
+    },
+    "tiebreaker": [
+        {
+            "question": "Quais são os três maiores rios do mundo em termos de volume de água?",
+            "answer": "Os três maiores rios do mundo em termos de volume de água são o Amazonas, o Nilo e o Yangtzé.",
+            "image": "",
+            "value": 0
+        },
+        {
+            "question": "Quais são os países que partilham uma fronteira comum com o Brasil?",
+            "answer": "Os países que compartilham uma fronteira comum com o Brasil são Argentina, Bolívia, Colômbia, Paraguai, Peru, Uruguai, e Venezuela.",
+            "image": "",
+            "value": 0
+        },
+        {
+            "question": "Qual é a capital mais alta do mundo?",
+            "answer": "A capital mais alta do mundo é La Paz, localizada na Bolívia, a uma altitude de aproximadamente 3.650 metros.",
+            "image": "",
+            "value": 0
+        },
+        {
+            "question": "Quais são os quatro pontos cardeais?",
+            "answer": "Os quatro pontos cardeais são Norte, Sul, Este e Oeste.",
+            "image": "",
+            "value": 0
+        },
+        {
+            "question": "Quais são os cinco oceanos do mundo?",
+            "answer": "Os cinco oceanos do mundo são o Oceano Atlântico, o Oceano Índico, o Oceano Pacífico, o Oceano Antártico e o Oceano Ártico.",
+            "image": "",
+            "value": 0
+        }
+    ]
+}

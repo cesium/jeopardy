@@ -11,7 +11,7 @@ interface GameOverProps {
 }
 
 export default function GameOver({ state, role, inView }: GameOverProps) {
-  const [playThemeSong, { stop }] = useSound("/sounds/themesong.mp3", {
+  const [playThemeSong] = useSound("/sounds/themesong.mp3", {
     loop: true,
     volume: 0.5,
   });

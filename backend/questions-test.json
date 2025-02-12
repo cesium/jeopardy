@@ -1,0 +1,64 @@
+{
+    "regular": {
+        "Algoritmos e Estruturas de Dados": [
+            {
+                "question": "Qual é a complexidade do algoritmo de procura binária no pior caso?",
+                "answer": "O(log n)",
+                "image": "",
+                "value": 100
+            },
+            {
+                "question": "Que estrutura de dados segue a regra 'First In, First Out' (FIFO)?",
+                "answer": "Fila (Queue)",
+                "image": "",
+                "value": 200
+            }
+        ],
+        "Segurança e Criptografia": [
+            {
+                "question": "Que mecanismo de segurança garante que uma senha armazenada não possa ser diretamente descoberta, apenas verificada?",
+                "answer": "Hashing",
+                "image": "",
+                "value": 100
+            },
+            {
+                "question": "O que é um 'keylogger'?",
+                "answer": "Programa que grava as teclas digitadas pelo usuário.",
+                "image": "",
+                "value": 200
+            }
+        ]
+    },
+    "tiebreaker": [
+        {
+            "question": "Quais são os três maiores rios do mundo em termos de volume de água?",
+            "answer": "Os três maiores rios do mundo em termos de volume de água são o Amazonas, o Nilo e o Yangtzé.",
+            "image": "",
+            "value": 0
+        },
+        {
+            "question": "Quais são os países que partilham uma fronteira comum com o Brasil?",
+            "answer": "Os países que compartilham uma fronteira comum com o Brasil são Argentina, Bolívia, Colômbia, Paraguai, Peru, Uruguai, e Venezuela.",
+            "image": "",
+            "value": 0
+        },
+        {
+            "question": "Qual é a capital mais alta do mundo?",
+            "answer": "A capital mais alta do mundo é La Paz, localizada na Bolívia, a uma altitude de aproximadamente 3.650 metros.",
+            "image": "",
+            "value": 0
+        },
+        {
+            "question": "Quais são os quatro pontos cardeais?",
+            "answer": "Os quatro pontos cardeais são Norte, Sul, Este e Oeste.",
+            "image": "",
+            "value": 0
+        },
+        {
+            "question": "Quais são os cinco oceanos do mundo?",
+            "answer": "Os cinco oceanos do mundo são o Oceano Atlântico, o Oceano Índico, o Oceano Pacífico, o Oceano Antártico e o Oceano Ártico.",
+            "image": "",
+            "value": 0
+        }
+    ]
+}
