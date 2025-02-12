@@ -4,19 +4,22 @@
 from asyncio import Lock
 from typing import List
 import logging
-from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect
+import os
+from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from starlette.middleware.base import BaseHTTPMiddleware
 import uvicorn
-import shared_globals
+from saves import get_last_save, get_saves_names, load_save, save_state
+from gamestate.gamestate import GameState
 
 # Initialize FastAPI app
 app = FastAPI()
 
 app.my_clients = set()
 app.my_clients_lock = Lock()
+app.my_state = None
 
 
 class StateConditionMiddleware(BaseHTTPMiddleware):
@@ -24,12 +27,14 @@ class StateConditionMiddleware(BaseHTTPMiddleware):
 
     async def dispatch(self, request: Request, call_next):
         if request.method == "POST":
-            shared_globals.state.reset_sound()
+            app.my_state.reset_sound()
         response = await call_next(request)
 
         if request.method == "POST" and response.status_code // 100 == 2:
             logging.info("Propagating state")
-            await send_to_clients(shared_globals.state.to_dict())
+            await send_to_clients(
+                app.my_state.to_dict(), request.url.path.replace("/", "")
+            )
 
         return response
 
@@ -61,17 +66,17 @@ async def catch_multiple_exceptions(_: Request, exc: Exception) -> JSONResponse:
             content={"detail": str(exc)},
         )
     # Handle other exceptions (optional)
-    logging.error(exc_info=str(exc))
+    logging.error(str(exc))
     return JSONResponse(
         status_code=500,
         content={"detail": "An unexpected error occurred."},
     )
 
 
-class Player(BaseModel):
-    """JSON representation of a player"""
+class Team(BaseModel):
+    """JSON representation of a team"""
 
-    name: str
+    names: List[str]
     balance: int
 
 
@@ -90,9 +95,9 @@ class Question(BaseModel):
 class State(BaseModel):
     """JSON representation of answering a question"""
 
-    currentPlayer: Player
+    currentTeam: Team
     state: int
-    players: List[Player]
+    teams: List[Team]
 
 
 class Answer(BaseModel):
@@ -119,16 +124,17 @@ class SetQuestion(BaseModel):
     id: int
 
 
-class SetPlayers(BaseModel):
-    """JSON representation of setting name of the players"""
+class SetTeams(BaseModel):
+    """JSON representation of setting name of the teams"""
 
-    players: List[str]
+    teams: List[List[str]]
 
 
-class Buzz(BaseModel):
+class Buzzer(BaseModel):
     """JSON representation of someone pressing the Buzz"""
 
-    player: int
+    controller: int
+    color: str
 
 
 @app.get("/state", response_model=State)
@@ -139,44 +145,47 @@ def get_state() -> dict:
         dict: JSON response
     """
     return {
-        "currentPlayer": shared_globals.state.get_current_player(),
-        "state": shared_globals.state.state,
-        "players": [None for p in shared_globals.state.list_players()],
+        "currentTeam": app.my_state.get_current_team(),
+        "state": app.my_state.state,
+        "teams": [p.to_dict() for p in app.my_state.list_teams()],
     }
 
 
-@app.get("/questions", response_class=List[Question])
+@app.get("/questions", response_model=list[list[Question]])
 def get_questions() -> list:
     """list all questions
 
     Returns:
         list: JSON response
     """
-    questions = shared_globals.state.list_questions()
+    questions = app.my_state.list_questions()
     categories = list({q.category for q in questions})
-    return [[q for q in questions if q.category == c] for c in categories]
+    return [[q.to_dict() for q in questions if q.category == c] for c in categories]
 
 
-@app.get("/winners", response_class=List[Player])
+@app.get("/winners", response_model=list[Team])
 def get_winners() -> list:
     """list the game winners
 
     Returns:
         list: JSON response
     """
-    return sorted(
-        shared_globals.state.list_players(), key=lambda p: p.balance, reverse=True
-    )
+    return [
+        t.to_dict()
+        for t in sorted(
+            app.my_state.list_teams(), key=lambda p: p.balance, reverse=True
+        )
+    ]
 
 
-@app.get("/players", response_class=List[Player])
-def get_players() -> list:
-    """list players
+@app.get("/teams", response_model=list[Team])
+def get_teams() -> list:
+    """list teams
 
     Returns:
         list: JSON response
     """
-    return [p.to_dict() for p in shared_globals.state.list_players()]
+    return [p.to_dict() for p in app.my_state.list_teams()]
 
 
 @app.get("/question/{idx}", response_model=Question)
@@ -189,7 +198,11 @@ def get_question(idx: int) -> dict:
     Returns:
         dict: JSON response
     """
-    return shared_globals.state.get_question(idx).to_dict()
+    print(idx)
+    q = app.my_state.get_question(idx)
+    if q is None:
+        raise HTTPException(status_code=404, detail="Question not found")
+    return q.to_dict()
 
 
 @app.post("/answer", response_model=AnswerResponse)
@@ -202,8 +215,8 @@ def post_answer(body: Answer) -> dict:
     Returns:
         dict: JSON response
     """
-    shared_globals.state.answer_question(body.correct)
-    return {"skip": (shared_globals.state.state != 2)}
+    app.my_state.answer_question(body.correct)
+    return {"skip": (app.my_state.state != 2)}
 
 
 @app.post("/skip", response_model=BasicResponse)
@@ -213,7 +226,7 @@ def post_skip() -> dict:
     Returns:
         dict: JSON response
     """
-    shared_globals.state.skip_question()
+    app.my_state.skip_question()
     return {"status": "success"}
 
 
@@ -222,40 +235,40 @@ def post_set_question(body: SetQuestion) -> dict:
     """select a question
 
     Args:
-        body (SetPlayers): id of the question selected
+        body (SetTeams): id of the question selected
 
     Returns:
         dict: JSON response
     """
-    shared_globals.state.select_question(body.id)
+    app.my_state.select_question(body.id)
     return {"status": "success"}
 
 
-@app.post("/players", response_model=BasicResponse)
-def post_players(body: SetPlayers) -> dict:
-    """set the name of the players
+@app.post("/teams", response_model=BasicResponse)
+def post_teams(body: SetTeams) -> dict:
+    """set the name of the teams
 
     Args:
-        body (SetPlayers): the name of the players
+        body (SetTeams): the name of the teams
 
     Returns:
         dict: JSON response
     """
-    shared_globals.state.set_players(body.players)
+    app.my_state.set_teams(body.teams)
     return {"status": "success"}
 
 
 @app.post("/buzz", response_model=BasicResponse)
-def post_buzz(body: Buzz) -> dict:
+def post_buzz(body: Buzzer) -> dict:
     """set as someone pressing the buzz button
 
     Args:
-        body (Buzz): id of pressed buzz controller
+        body (Buzzer): id of pressed buzz controller
 
     Returns:
         dict: JSON response
     """
-    shared_globals.state.set_current_player(body.player)
+    app.my_state.buzz(body.controller, body.color)
     return {"status": "success"}
 
 
@@ -266,17 +279,165 @@ def post_buzz_start() -> dict:
     Returns:
         dict: JSON response
     """
-    shared_globals.state.set_answering()
-    with shared_globals.buzz_condition:
-        shared_globals.buzz_condition.notify_all()
+    app.my_state.set_answering()
     return {"status": "success"}
 
 
-async def send_to_clients(message: str | dict):
+@app.post("/show_tiebreaker_question", response_model=BasicResponse)
+def post_show_tiebreaker_question() -> dict:
+    """show tiebreaker
+
+    Returns:
+        dict: JSON response
+    """
+    app.my_state.show_tiebreaker_question()
+    return {"status": "success"}
+
+
+@app.post("/stop_timer", response_model=BasicResponse)
+def post_stop_timer() -> dict:
+    """stop accepting buzz inputs
+
+    Returns:
+        dict: JSON response
+    """
+    app.my_state.stop_countdown_timer()
+    return {"status": "success"}
+
+
+@app.post("/show_sos", response_model=BasicResponse)
+def post_show_sos() -> dict:
+    """show SOS
+
+    Returns:
+        dict: JSON response
+    """
+    app.my_state.show_sos()
+    return {"status": "success"}
+
+
+@app.post("/show_tiebreaker", response_model=BasicResponse)
+def post_show_tiebreaker() -> dict:
+    """show tiebreaker
+
+    Returns:
+        dict: JSON response
+    """
+    app.my_state.show_tiebreaker()
+    return {"status": "success"}
+
+
+@app.post("/end", response_model=BasicResponse)
+def post_end() -> dict:
+    """end the game
+
+    Returns:
+        dict: JSON response
+    """
+    app.my_state.end_game()
+    return {"status": "success"}
+
+
+class FixPoints(BaseModel):
+    """JSON representation needing to alter a team's points"""
+
+    team_id: int
+    points: int
+
+
+@app.post("/fix/points/", response_model=BasicResponse)
+def post_fix_pontos(body: FixPoints) -> dict:
+    """add/subtract points to a team
+
+    Args:
+        body (FixPoints): body of the request
+
+    Returns:
+        dict: JSON response
+    """
+    app.my_state.add_points(body.team_id, body.points)
+    return {"status": "success"}
+
+
+class FixState(BaseModel):
+    """JSON representation needing to alter a team's points"""
+
+    state: int
+
+
+@app.post("/fix/state/", response_model=BasicResponse)
+def post_fix_state(body: FixState) -> dict:
+    """change the state of the game
+
+    Args:
+        body (FixState): body of the request
+
+    Returns:
+        dict: JSON response
+    """
+    app.my_state.set_state(body.state)
+    return {"status": "success"}
+
+
+class FixSelecting(BaseModel):
+    """JSON representation needing to alter a team's points"""
+
+    team_id: int
+
+
+@app.post("/fix/selecting/", response_model=BasicResponse)
+def post_fix_selecting(body: FixSelecting) -> dict:
+    """change the selecting team of the game
+
+    Args:
+        body (FixSelecting): body of the request
+
+    Returns:
+        dict: JSON response
+    """
+    app.my_state.set_selecting(body.team_id)
+    return {"status": "success"}
+
+
+@app.get("/fix/saves/", response_model=list[str])
+def get_fix_saves() -> list:
+    """list all saved game states
+
+    Returns:
+        list: JSON response
+    """
+    return list(map(lambda x: x[1], get_saves_names()))
+
+
+class FixSave(BaseModel):
+    """JSON representation for reverting to a saved game state"""
+
+    name: str
+
+
+@app.post("/fix/saves/", response_model=BasicResponse)
+def post_fix_saves(body: FixSave) -> dict:
+    """revert to a saved game state
+
+    Args:
+        body (FixSave): body of the request
+
+    Returns:
+        dict: JSON response
+    """
+    state = load_save(body.name)
+    if state is None:
+        raise HTTPException(status_code=404, detail="Save not found")
+    app.my_state = state
+    return {"status": "success"}
+
+
+async def send_to_clients(message: str | dict, action: str):
     """Broadcast a message to every websocket connected
 
     Args:
         message (str|dict): the message to broadcast
+        action (str): the action that triggered the message
     """
     async with app.my_clients_lock:
         for client in list(app.my_clients):
@@ -284,6 +445,8 @@ async def send_to_clients(message: str | dict):
                 await client.send_text(message)
             elif isinstance(message, dict):
                 await client.send_json(message)
+    app.my_state.reset_sound()
+    save_state(app.my_state, action)
 
 
 @app.websocket("/ws")
@@ -296,25 +459,28 @@ async def websocket_endpoint(ws: WebSocket):
     await ws.accept()
     async with app.my_clients_lock:
         app.my_clients.add(ws)
-    await ws.send_json(shared_globals.state.to_dict())
+    await ws.send_json(app.my_state.to_dict())
     try:
         while True:
             message = await ws.receive_text()
-            send_to_clients(message)
+            send_to_clients(message, "ws_message_recieved")
     except WebSocketDisconnect:
         async with app.my_clients_lock:
             app.my_clients.remove(ws)
-    finally:
-        await ws.close()
 
 
-def webserver_thread(host: str, port: int):
+def start(host: str, port: int, controllers_port: int):
     """fuction to start webserver
 
     Args:
         host (str): host server will run on
         port (int): port server will run on
     """
+    if not os.path.exists("backend/saves"):
+        os.mkdir("backend/saves")
 
-    print(f"Server running on {host}:{port}")
+    app.my_state = get_last_save()
+    if app.my_state is None:
+        app.my_state = GameState("localhost", controllers_port)
+
     uvicorn.run(app, host=host, port=port, ws="websockets")

@@ -2,10 +2,11 @@ import { useState, useEffect, useCallback } from "react";
 import { State } from "../../../types";
 import { processState } from "../../../lib/utils";
 import * as api from "../../../lib/api";
+import useSound from "use-sound";
 
 interface GameSelectingQuestionProps {
   state: State;
-  role: string;
+  role: "viewer" | "staff" | "host";
   startOpenAnimation: boolean;
   inView: boolean;
   animationPosition: number;
@@ -77,12 +78,46 @@ export default function GameSelectingQuestion({
       setLeft(left);
       setTop(top);
     },
-    [cellWidth, columnsNr]
+    [cellWidth, columnsNr],
   );
 
   useEffect(() => {
     getPosition(animationPosition);
   }, [animationPosition, getPosition]);
+
+  const [playOpenQuestion] = useSound("/sounds/swoosh-zoom-in.mp3", {
+    volume: 1,
+    interrupt: true,
+  });
+  const [playBackgroundThemeSong, { stop }] = useSound(
+    "/sounds/themesong.mp3",
+    {
+      volume: 0.5,
+      loop: true,
+      interrupt: true,
+    },
+  );
+
+  useEffect(() => {
+    if (role === "viewer") {
+      if (state.actions.playQuestionSelectionSound) {
+        playOpenQuestion();
+      }
+      if (state.actions.playSelectingQuestionSound) {
+        playBackgroundThemeSong();
+      }
+      if (state.state !== 1) {
+        stop();
+      }
+    }
+  }, [
+    role,
+    state.actions,
+    playOpenQuestion,
+    playBackgroundThemeSong,
+    state.state,
+    stop,
+  ]);
 
   const setQuestion = (id) => {
     api.setQuestion(id);
@@ -119,7 +154,7 @@ export default function GameSelectingQuestion({
             className={`bg-gradient-to-br from-accent/90 to-accent/40 backdrop-blur-md text-primary p-10 rounded-md flex space-x-2 place-content-center h-[140px] items-center ${q.answered && "opacity-40"} ${!q.answered && role === "staff" && "hover:border"} border-primary`}
             key={`question-${idx}`}
             disabled={q.answered || role !== "staff"}
-            onClick={(_) => setQuestion(q.id)}
+            onClick={() => setQuestion(q.id)}
           >
             {!q.answered && (
               <p className="text-8xl drop-shadow-lg">
@@ -130,10 +165,22 @@ export default function GameSelectingQuestion({
         ))}
       </div>
       <div className="flex items-center justify-center h-full">
-        {state.players.map((p, idx) => (
-          <div key={`player-${idx}`} className="mx-12 uppercase">
-            <p className={`font-bold text-4xl ${state.selectingPlayer === idx && "text-primary"}`}>{p.name}</p>
-            <p className={`font-medium text-3xl mt-2 ${state.selectingPlayer === idx && "text-primary"}`}>{p.balance}</p>
+        {state.teams.map((p, idx) => (
+          <div
+            key={`team-${idx}`}
+            className={`mx-12 uppercase ${state.state === 1 && state.selectingTeam === idx && "text-primary"}`}
+          >
+            <div className="flex flex-col space-y-0.5">
+              {p.names.map((name, index) => (
+                <p
+                  key={index}
+                  className={`font-bold text-4xl ${state.state === 1 && state.selectingTeam === idx && "animate-bounce"}`}
+                >
+                  {name}
+                </p>
+              ))}
+            </div>
+            <p className="font-medium text-3xl mt-2">{p.balance}</p>
           </div>
         ))}
       </div>

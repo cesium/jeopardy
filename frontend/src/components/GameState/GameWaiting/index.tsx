@@ -9,7 +9,7 @@ import useSound from "use-sound";
 
 interface GameWaitingProps {
   state: State;
-  role: string;
+  role: "viewer" | "staff" | "host";
 }
 
 function PlayerInput({ id, onChange }) {
@@ -25,18 +25,16 @@ function PlayerInput({ id, onChange }) {
   );
 }
 
-function GameWaitingNonStaff({ state }: GameWaitingProps) {
+function GameWaitingNonStaff({ state, role }: GameWaitingProps) {
   const [playThemeSong, { stop }] = useSound("/sounds/themesong.mp3", {
     loop: true,
     volume: 0.5,
   });
 
   useEffect(() => {
-    playThemeSong();
-    if (state.state != 0) {
-      stop();
-    }
-  }, [state, playThemeSong, stop]);
+    if (role === "viewer" && state.actions.playThemeSong) playThemeSong();
+    if (state.state !== 0) stop();
+  }, [state, playThemeSong, stop, role]);
 
   return (
     <div className="flex items-center h-screen justify-center text-white">
@@ -59,7 +57,8 @@ function GameWaitingStaff({ state }: GameWaitingProps) {
   };
 
   const submit = () => {
-    api.setPlayers(names);
+    //TODO: Actual use a list of names
+    api.setTeams(names.map((n) => n.split(";")));
   };
 
   return (
@@ -72,8 +71,8 @@ function GameWaitingStaff({ state }: GameWaitingProps) {
           <PlayerInput key={i} id={i + 1} onChange={(n) => updateNames(n, i)} />
         ))}
         <button
-          className="py-4 w-full m-auto mt-8 bg-green-700 uppercase text-xl"
-          onClick={(_) => submit()}
+          className="py-4 w-full m-auto mt-8 bg-green-700 uppercase text-xl rounded-sm"
+          onClick={() => submit()}
         >
           Start
         </button>

@@ -1,5 +1,5 @@
-export type Player = {
-  name: string;
+export type Team = {
+  names: string[];
   balance: number;
 };
 
@@ -11,16 +11,29 @@ export type Question = {
   value: number;
   category: string;
   answered: boolean;
+  tta: number; // seconds
 };
 
 export type State = {
-  players: Player[];
+  teams: Team[];
   questions: Question[];
   state: number;
   currentQuestion: Question;
-  currentPlayer: Player;
-  selectingPlayer: number;
+  currentTeam: number;
+  selectingTeam: number;
   alreadyAnswered: number[];
-  playCorrectSound: boolean;
-  playWrongSound: boolean;
+  SOSAnswers: boolean[];
+  actions: {
+    playCorrectSound: boolean;
+    playWrongSound: boolean;
+    playStartAccepting: boolean;
+    playBuzzerSound: boolean;
+    playEndSound: boolean;
+    stopTimer: boolean;
+    showSOS: boolean;
+    showTiebreakQuestion: boolean;
+    playThemeSong: boolean;
+    playQuestionSelectionSound: boolean;
+    playSelectingQuestionSound: boolean;
+  };
 };

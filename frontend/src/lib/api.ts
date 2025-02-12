@@ -33,8 +33,8 @@ export async function skipQuestion() {
   return response.data;
 }
 
-export async function getPlayers() {
-  const response = await API.get("/players");
+export async function getTeams() {
+  const response = await API.get("/teams");
 
   return response.data;
 }
@@ -53,9 +53,9 @@ export async function setQuestion(id: number) {
   return response.data;
 }
 
-export async function setPlayers(players: string[]) {
-  const response = await API.post("/players", {
-    players: players,
+export async function setTeams(teams: string[][]) {
+  const response = await API.post("/teams", {
+    teams: teams,
   });
 
   return response.data;
@@ -66,5 +66,62 @@ export async function answer(correct: boolean) {
     correct: correct,
   });
 
+  return response.data;
+}
+
+export async function stopTimer() {
+  const response = await API.post("/stop_timer");
+  return response.data;
+}
+
+export async function showSOSResults() {
+  const response = await API.post("/show_sos");
+  return response.data;
+}
+
+export async function showTiebreakQuestion() {
+  const response = await API.post("/show_tiebreaker_question");
+  return response.data;
+}
+
+export async function endGame() {
+  const response = await API.post("/end");
+  return response.data;
+}
+
+export async function fixSelectingTeam(team: number) {
+  const response = await API.post("/fix/selecting/", {
+    team_id: team,
+  });
+
+  return response.data;
+}
+
+export async function fixState(state: number) {
+  const response = await API.post("/fix/state/", {
+    state: state,
+  });
+
+  return response.data;
+}
+
+export async function fixPoints(team: number, points: number) {
+  const response = await API.post("/fix/points/", {
+    team_id: team,
+    points: points,
+  });
+
+  return response.data;
+}
+
+export async function fixListSaves() {
+  const response = await API.get("/fix/saves/");
+  return response.data;
+}
+
+export async function fixSaves(save: string) {
+  const response = await API.post("/fix/saves/", {
+    name: save,
+  });
   return response.data;
 }
